@@ -99,10 +99,11 @@ body {
 }
 
 .avatar {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
     background-color: var(--caramel);
     border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .user-card strong {
@@ -271,7 +272,7 @@ td {
 
 .status.expired {
     background-color: var(--red);
-    color: var(--yellow-text);
+    color: var(--red-text);
 }
 
 .merma-btn {
@@ -439,7 +440,7 @@ select:focus {
     }
 
     .user-card {
-        display: none;
+        display:none;
     }
 
     .main-content {

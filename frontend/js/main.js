@@ -7,7 +7,7 @@ const closeModalBtn = document.getElementById("closeModalBtn");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
-const vencidos = document.getElementById(vencidos);
+const vencidos = document.getElementById("vencidos");
 const mermaTotal = document.getElementById("mermaTotal");
 
 let productos = [
@@ -87,7 +87,13 @@ productForm.addEventListener("submit", (event) => {
         return;        
     }
 
-    productos.reset();
+    productos.push(nuevoProducto);
+
+    console.log("Producto agregado:", nuevoProducto);
+    console.log("Lista actual:", productos);
+
+
+    productForm.reset();
     productModal.classList.remove("show");
 
     renderizarInventario();
@@ -152,10 +158,10 @@ function renderizarInventario() {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-            <td>${producto.nombre}</td>
-            <td>${producto.cantidad} ${producto.unidad}</td>
-            <td>${formatearFecha(producto.fechaIngreso)}</td>
-            <td>${formatearFecha(producto.fechaCaducidad)}</td>
+            <td>${productos.nombre}</td>
+            <td>${productos.cantidad} ${productos.unidad}</td>
+            <td>${formatearFecha(productos.fechaIngreso)}</td>
+            <td>${formatearFecha(productos.fechaCaducidad)}</td>
             <td>${diasRestantes}</td>
             <td>
                 <span class="status ${estado.clase}">
@@ -163,7 +169,7 @@ function renderizarInventario() {
                 </span>
             </td>
             <td>
-                <button class"merma-btn" onclick="registrarMerma(${index})">>
+                <button class="merma-btn" onclick="registrarMerma(${index})">>
                     Registrar merma
                 </button>
             </td>
@@ -203,7 +209,7 @@ function registrarMerma(index) {
         return;
     }
 
-    const motivoNormailzado = motivo.toLowerCase().trim();
+    const motivoNormalizado = motivo.toLowerCase().trim();
 
     if (
         motivoNormalizado !== "consumo" &&
