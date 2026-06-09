@@ -92,6 +92,7 @@ productForm.addEventListener("submit", (event) => {
     console.log("Producto agregado:", nuevoProducto);
     console.log("Lista actual:", productos);
 
+    guardarDatos();
 
     productForm.reset();
     productModal.classList.remove("show");
@@ -223,7 +224,29 @@ function registrarMerma(index) {
     productos.splice(index, 1);
     mermasRegistradas++;
 
+    guardarDatos();
+
     renderizarInventario();
 }
 
+
+function guardarDatos() {
+    localStorage.setItem("logisticat_productos", JSON.stringify(productos));
+    localStorage.setItem("logisticat_mermas", JSON.stringify(mermasRegistradas));
+}
+
+function cargarDatos() {
+    const productosGuardados = localStorage.getItem("logisticat_productos");
+    const mermasGuardadas = localStorage.getItem("logisticat_mermas");
+    
+    if (productosGuardados) {
+        productos = JSON.parse(productosGuardados);
+    }
+
+    if (mermasGuardadas) {
+        mermasRegistradas = JSON.parse(mermasGuardadas);
+    }
+}
+
+cargarDatos();
 renderizarInventario();
