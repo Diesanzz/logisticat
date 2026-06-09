@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logisticat | Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+    
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">☕</div>
+            <h2>Logisticat</h2>
+        </div>
+
+        <nav class="menu">
+            <a href="#" class="menu-item active">☕ Dashboard</a>
+            <a href="#" class="menu-item">📦 Inventario</a>
+            <a href="#" class="menu-item">🔔 Alertas</a>
+            <a href="#" class="menu-item">📊 Reportes</a>
+        </nav>
+
+        <div class="user-card">
+            <div class="avatar"></div>
+            <div>
+                <strong>Admin</strong>
+                <span>Gerente</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h1>DASHBOARD</h1>
+            <p>Control de inventario, caducidades y merma para cafeterias</p>
+        </header>
+
+        <section class="stats-grid">
+            <article class="stat-card border-brown">
+                <span>Inventario total</span>
+                <strong id="totalProductos">0</strong>
+            </article>
+
+            <article class="stat-card border-yellow">
+                <span>Por caducar</span>
+                <strong id="porCaducar">0</strong>
+            </article>
+
+            <article class="stat-card border-red">
+                <span>Productos vencidos</span>
+                <strong id="vencidos">0</strong>
+            </article>
+
+            <article class="stat-card border-brown">
+                <span>Merma total</span>
+                <strong id="mermaTotal">0%</strong>
+            </article>
+        </section>
+
+        <section class="inventory-section">
+            <div class="section-header">
+                <div>
+                    <h2>Inventario</h2>
+                    <p>Productos ordenados por fecha de caducidad</p>
+                </div>
+
+                <button id="openModalBtn" class="primary-btn">
+                    + Agregar producto
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Fecha Ingreso</th>
+                            <th>Caducidad</th>
+                            <th>Días Restantes</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="inventoryTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="insights-section">
+            <h2>Insights y recomendaciones</h2>
+
+            <div class="insights-grid">
+                <article class="insight-card">
+                    <div class="insight-icon green">💡</div>
+                    <div>
+                        <h3>Alerta de caducidad</h3>
+                        <p>Los productos marcados en amarillo deben priorizarse durante los próximos días.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <button id="closeModalBtn" class="close-btn">×</button>
+
+            <h2>Agregar productos</h2>
+            <p>Registra un nuevo insumo en el inventario.</p>
+
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="nombre">Nombre del producto</label>
+                    <input type="text" id="nombre" placeholder="Ej. Leche entera 1L" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad</label>
+                        <input type="number" id="cantidad" min="1" placeholder="Ej. 10" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="unidad">Unidad</label>
+                        <select id="unidad" required>
+                            <option value="">Selecciona</option>
+                            <option value="pieza">Pieza</option>
+                            <option value="kg">Kg</option>
+                            <option value="g">g</option>
+                            <option value="L">L</option>
+                            <option value="ml">ml</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaIngreso">Fecha de ingreso</label>
+                        <input type="date" id="fechaIngreso" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaCaducidad">Fecha de caducidad</label>
+                        <input type="date" id="fechaCaducidad" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="primary-btn full=btn">
+                    Guardar producto
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
