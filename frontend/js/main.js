@@ -10,51 +10,9 @@ const porCaducar = document.getElementById("porCaducar");
 const vencidos = document.getElementById("vencidos");
 const mermaTotal = document.getElementById("mermaTotal");
 
-let productos = [
-    {
-        nombre: "Café Molido",
-        cantidad: 14,
-        unidad: "kg",
-        fechaIngreso: "2026-03-10",
-        fechaCaducidad: "2026-09-10"
-    },
-    {
-        nombre: "Leche Deslactosada",
-        cantidad: 23,
-        unidad: "L",
-        fechaIngreso: "2026-03-14",
-        fechaCaducidad: "2026-09-20"
-    },
-    {
-        nombre: "Queso tipo Philadelphia",
-        cantidad: 7,
-        unidad: "pieza",
-        fechaIngreso: "2026-03-01",
-        fechaCaducidad: "2026-03-18"
-    },
-    {
-        nombre: "Polvo de chocolate para bebida",
-        cantidad: 4,
-        unidad: "kg",
-        fechaIngreso: "2026-01-05",
-        fechaCaducidad: "2027-03-05"
-    },
-    {
-        nombre: "Jamón de pierna Kirkland",
-        cantidad: 5,
-        unidad: "kg",
-        fechaIngreso: "2026-03-12",
-        fechaCaducidad: "2026-03-14"
-    },
-    {
-        nombre: "Crema batida Lyncott",
-        cantidad: 3,
-        unidad: "ml",
-        fechaIngreso: "2026-03-08",
-        fechaCaducidad: "2026-03-10"
-    },
-];
+const API_URL = "http://localhost:3000/api/productos";
 
+let productos = [];
 let mermasRegistradas = 0;
 
 openModalBtn.addEventListener("click", () => {
@@ -65,13 +23,13 @@ closeModalBtn.addEventListener("click", () => {
     productModal.classList.remove("show");
 });
 
-productModal.addEventListener("click", (event) =>{
+productModal.addEventListener("click", (event) => {
     if (event.target === productModal) {
         productModal.classList.remove("show");
     }
 });
 
-productForm.addEventListener("submit", (event) => {
+productForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const nuevoProducto = {
@@ -84,21 +42,54 @@ productForm.addEventListener("submit", (event) => {
 
     if (new Date(nuevoProducto.fechaCaducidad) < new Date(nuevoProducto.fechaIngreso)) {
         alert("La fecha de caducidad no puede ser menor que la fecha de ingreso.");
-        return;        
+        return;
     }
 
-    productos.push(nuevoProducto);
+    try {
+        const respuesta = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(nuevoProducto)
+        });
 
-    console.log("Producto agregado:", nuevoProducto);
-    console.log("Lista actual:", productos);
+        const datos = await respuesta.json();
 
-    guardarDatos();
+        if (!respuesta.ok) {
+            alert(datos.message || "Error al registrar el producto.");
+            return;
+        }
 
-    productForm.reset();
-    productModal.classList.remove("show");
+        productForm.reset();
+        productModal.classList.remove("show");
 
-    renderizarInventario();
+        await obtenerProductosDesdeAPI();
+
+    } catch (error) {
+        console.error("Error al conectar con el backend:", error);
+        alert("No se pudo conectar con el servidor. Revisa que el backend esté encendido.");
+    }
 });
+
+async function obtenerProductosDesdeAPI() {
+    try {
+        const respuesta = await fetch(API_URL);
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            alert(datos.message || "Error al obtener productos.");
+            return;
+        }
+
+        productos = datos.productos;
+        renderizarInventario();
+
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        alert("No se pudo conectar con el backend. Revisa que npm run dev esté activo.");
+    }
+}
 
 function calcularDiasRestantes(fechaCaducidad) {
     const hoy = new Date();
@@ -112,7 +103,7 @@ function calcularDiasRestantes(fechaCaducidad) {
     return dias;
 }
 
-function obtenerEstado (diasRestantes) {
+function obtenerEstado(diasRestantes) {
     if (diasRestantes < 0) {
         return {
             texto: "Vencido",
@@ -148,21 +139,17 @@ function formatearFecha(fecha) {
 function renderizarInventario() {
     inventoryTable.innerHTML = "";
 
-    const productosOrdenados = [...productos].sort((a, b) => {
-        return new Date(a.fechaCaducidad) - new Date (b.fechaCaducidad);
-    });
-
-    productosOrdenados.forEach((productos, index) => {
-        const diasRestantes = calcularDiasRestantes(productos.fechaCaducidad);
+    productos.forEach((producto) => {
+        const diasRestantes = calcularDiasRestantes(producto.fechaCaducidad);
         const estado = obtenerEstado(diasRestantes);
 
         const row = document.createElement("tr");
 
         row.innerHTML = `
-            <td>${productos.nombre}</td>
-            <td>${productos.cantidad} ${productos.unidad}</td>
-            <td>${formatearFecha(productos.fechaIngreso)}</td>
-            <td>${formatearFecha(productos.fechaCaducidad)}</td>
+            <td>${producto.nombre}</td>
+            <td>${producto.cantidad} ${producto.unidad}</td>
+            <td>${formatearFecha(producto.fechaIngreso)}</td>
+            <td>${formatearFecha(producto.fechaCaducidad)}</td>
             <td>${diasRestantes}</td>
             <td>
                 <span class="status ${estado.clase}">
@@ -170,7 +157,7 @@ function renderizarInventario() {
                 </span>
             </td>
             <td>
-                <button class="merma-btn" onclick="registrarMerma(${index})">>
+                <button class="merma-btn" onclick="registrarMerma(${producto.id})">
                     Registrar merma
                 </button>
             </td>
@@ -195,7 +182,9 @@ function actualizarEstadisticas() {
         return dias < 0;
     }).length;
 
-    const porcentajeMerma = total === 0 ? 0 : Math.round((mermasRegistradas / (total + mermasRegistradas)) * 100);
+    const porcentajeMerma = total === 0
+        ? 0
+        : Math.round((mermasRegistradas / (total + mermasRegistradas)) * 100);
 
     totalProductos.textContent = total;
     porCaducar.textContent = productosPorCaducar;
@@ -203,7 +192,7 @@ function actualizarEstadisticas() {
     mermaTotal.textContent = `${porcentajeMerma}%`;
 }
 
-function registrarMerma(index) {
+async function registrarMerma(idProducto) {
     const motivo = prompt("Motivo de la merma: consumo, daño o caducidad");
 
     if (!motivo) {
@@ -221,32 +210,32 @@ function registrarMerma(index) {
         return;
     }
 
-    productos.splice(index, 1);
-    mermasRegistradas++;
+    try {
+        const respuesta = await fetch(`${API_URL}/${idProducto}/merma`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                motivo: motivoNormalizado
+            })
+        });
 
-    guardarDatos();
+        const datos = await respuesta.json();
 
-    renderizarInventario();
-}
+        if (!respuesta.ok) {
+            alert(datos.message || "Error al registrar merma.");
+            return;
+        }
 
+        mermasRegistradas++;
 
-function guardarDatos() {
-    localStorage.setItem("logisticat_productos", JSON.stringify(productos));
-    localStorage.setItem("logisticat_mermas", JSON.stringify(mermasRegistradas));
-}
+        await obtenerProductosDesdeAPI();
 
-function cargarDatos() {
-    const productosGuardados = localStorage.getItem("logisticat_productos");
-    const mermasGuardadas = localStorage.getItem("logisticat_mermas");
-    
-    if (productosGuardados) {
-        productos = JSON.parse(productosGuardados);
+    } catch (error) {
+        console.error("Error al registrar merma:", error);
+        alert("No se pudo conectar con el servidor.");
     }
-
-    if (mermasGuardadas) {
-        mermasRegistradas = JSON.parse(mermasGuardadas);
-    }
 }
 
-cargarDatos();
-renderizarInventario();
+obtenerProductosDesdeAPI();
