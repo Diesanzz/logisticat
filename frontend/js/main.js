@@ -94,9 +94,10 @@ async function obtenerProductosDesdeAPI() {
 
 function calcularDiasRestantes(fechaCaducidad) {
     const hoy = new Date();
-    const caducidad = new Date(fechaCaducidad + "T00:00:00");
+    const caducidad = new Date(fechaCaducidad);
 
     hoy.setHours(0, 0, 0, 0);
+    caducidad.setHours(0, 0, 0, 0);
 
     const diferencia = caducidad - hoy;
     const dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
@@ -133,8 +134,13 @@ function obtenerEstado(diasRestantes) {
 }
 
 function formatearFecha(fecha) {
-    const partes = fecha.split("-");
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    const fechaObj = new Date(fecha);
+
+    const dia = String(fechaObj.getDate()).padStart(2, "0");
+    const mes = String(fechaObj.getMonth() + 1).padStart(2, "0");
+    const anio = fechaObj.getFullYear();
+
+    return `${dia}/${mes}/${anio}`;
 }
 
 function renderizarInventario() {

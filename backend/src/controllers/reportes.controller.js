@@ -1,13 +1,11 @@
-const {
-    obtenerProductosData,
-    obtenerMermaData
-} = require("./productos.controller");
+const pool = require("../database/connection");
 
 function calcularDiasRestantes(fechaCaducidad) {
     const hoy = new Date();
-    const caducidad = new Date(fechaCaducidad + "T00:00:00");
+    const caducidad = new Date(fechaCaducidad);
 
     hoy.setHours(0, 0, 0, 0);
+    caducidad.setHours(0, 0, 0, 0);
 
     const diferencia = caducidad - hoy;
     const dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
@@ -15,38 +13,53 @@ function calcularDiasRestantes(fechaCaducidad) {
     return dias;
 }
 
-function obtenerResumen(req, res) {
-    const productos = obtenerProductosData();
-    const merma = obtenerMermaData();
+async function obtenerResumen(req, res) {
+    try {
+        const [productos] = await pool.query(`
+            SELECT fecha_caducidad AS fechaCaducidad
+            FROM productos
+        `);
 
-    const totalProductos = productos.length;
+        const [mermas] = await pool.query(`
+            SELECT id_merma
+            FROM mermas
+        `);
 
-    const productosPorCaducar = productos.filter((producto) => {
-        const dias = calcularDiasRestantes(producto.fechaCaducidad);
-        return dias >= 0 && dias <= 7;
-    }).length;
+        const totalProductos = productos.length;
 
-    const productosVencidos = productos.filter((producto) => {
-        const dias = calcularDiasRestantes(producto.fechaCaducidad);
-        return dias < 0;
-    }).length;
+        const productosPorCaducar = productos.filter((producto) => {
+            const dias = calcularDiasRestantes(producto.fechaCaducidad);
+            return dias >= 0 && dias <= 7;
+        }).length;
 
-    const totalMermas = merma.length;
+        const productosVencidos = productos.filter((producto) => {
+            const dias = calcularDiasRestantes(producto.fechaCaducidad);
+            return dias < 0;
+        }).length;
 
-    const porcentajeMerma = totalProductos + totalMermas === 0
-    ? 0
-    : Math.round((totalMermas / (totalProductos + totalMermas)) *100);
+        const totalMermas = mermas.length;
 
-    res.json({
-        ok: true,
-        resumen: {
-            totalProductos,
-            productosPorCaducar,
-            productosVencidos,
-            totalMermas,
-            porcentajeMerma
-        }
-    });
+        const porcentajeMerma = totalProductos + totalMermas === 0
+            ? 0
+            : Math.round((totalMermas / (totalProductos + totalMermas)) * 100);
+
+        res.json({
+            ok: true,
+            resumen: {
+                totalProductos,
+                productosPorCaducar,
+                productosVencidos,
+                totalMermas,
+                porcentajeMerma
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            message: "Error al obtener resumen",
+            error: error.message
+        });
+    }
 }
 
 module.exports = {
