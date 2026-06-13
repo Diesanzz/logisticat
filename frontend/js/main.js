@@ -11,6 +11,7 @@ const vencidos = document.getElementById("vencidos");
 const mermaTotal = document.getElementById("mermaTotal");
 
 const API_URL = "http://localhost:3000/api/productos";
+const REPORTES_URL = "http://localhost:3000/api/reportes/resumen";
 
 let productos = [];
 let mermasRegistradas = 0;
@@ -166,7 +167,7 @@ function renderizarInventario() {
         inventoryTable.appendChild(row);
     });
 
-    actualizarEstadisticas();
+    obtenerResumenDesdeAPI();
 }
 
 function actualizarEstadisticas() {
@@ -190,6 +191,28 @@ function actualizarEstadisticas() {
     porCaducar.textContent = productosPorCaducar;
     vencidos.textContent = productosVencidos;
     mermaTotal.textContent = `${porcentajeMerma}%`;
+}
+
+async function obtenerResumenDesdeAPI() {
+    try {
+        const respuesta = await fetch(REPORTES_URL);
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            alert(datos.message || "Error al obtener el resumen del dashboard.");
+            return;
+        }
+
+        const resumen = datos.resumen;
+
+        totalProductos.textContent = resumen.totalProductos;
+        porCaducar.textContent = resumen.productosPorCaducar;
+        vencidos.textContent = resumen.productosVencidos;
+        mermaTotal.textContent = `${resumen.porcentajeMerma}%`;
+    } catch (error) {
+        console.error("Error al obtener resumen:", error);
+        alert("No se pudo conectar con la API de reportes.");
+    }
 }
 
 async function registrarMerma(idProducto) {
