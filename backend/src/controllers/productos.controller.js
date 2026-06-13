@@ -56,6 +56,17 @@ async function crearProducto(req, res) {
             VALUES (?, ?, ?, ?, ?)
         `, [nombre, cantidad, unidad, fechaIngreso, fechaCaducidad]);
 
+        await pool.query(`
+            INSERT INTO movimientos (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
+            VALUES (?, ?, 'entrada', ?, ?, ?)
+        `, [
+            resultado.insertId,
+            nombre,
+            cantidad,
+            unidad,
+            "Registro inicial de producto"
+        ]);
+
         res.status(201).json({
             ok: true,
             message: "Producto creado correctamente",
@@ -114,6 +125,17 @@ async function registrarMerma(req, res) {
         await pool.query(`
             INSERT INTO mermas (id_producto, nombre_producto, cantidad, unidad, motivo)
             VALUES (?, ?, ?, ?, ?)
+        `, [
+            producto.id_producto,
+            producto.nombre,
+            producto.cantidad,
+            producto.unidad,
+            motivoNormalizado
+        ]);
+
+        await pool.query(`
+            INSERT INTO movimientos (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
+            VALUES (?, ?, 'merma', ?, ?, ?)
         `, [
             producto.id_producto,
             producto.nombre,
