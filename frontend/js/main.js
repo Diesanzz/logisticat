@@ -238,4 +238,4 @@ async function registrarMerma(idProducto) {
     }
 }
 
-obtenerProductosDesdeAPI();
+obtenerProductosDesdeAPI(); 

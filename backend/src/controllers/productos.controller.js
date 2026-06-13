@@ -140,9 +140,19 @@ function eliminarProducto(req, res) {
     });
 }
 
+function obtenerProductosData() {
+    return productos;
+}
+
+function obtenerMermaData() {
+    return mermas;
+}
+
 module.exports = {
     obtenerProductos,
     crearProducto,
     registrarMerma,
-    eliminarProducto
+    eliminarProducto,
+    obtenerProductosData,
+    obtenerMermaData
 };
