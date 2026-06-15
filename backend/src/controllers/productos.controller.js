@@ -121,6 +121,7 @@ async function registrarMerma(req, res) {
 
         const producto = productos[0];
         const motivoNormalizado = motivo.toLowerCase().trim();
+        const tipoMovimiento = motivoNormalizado === "consumo" ? "salida" : "merma";
 
         await pool.query(`
             INSERT INTO mermas (id_producto, nombre_producto, cantidad, unidad, motivo)
@@ -135,10 +136,11 @@ async function registrarMerma(req, res) {
 
         await pool.query(`
             INSERT INTO movimientos (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
-            VALUES (?, ?, 'merma', ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
         `, [
             producto.id_producto,
             producto.nombre,
+            tipoMovimiento,
             producto.cantidad,
             producto.unidad,
             motivoNormalizado

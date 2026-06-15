@@ -20,3 +20,14 @@ CREATE TABLE IF NOT EXISTS mermas (
     fecha_caducidad DATE NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS movimientos (
+    id_movimiento INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT NULL,
+    nombre_producto VARCHAR(100) NOT NULL,
+    tipo ENUM('entrada', 'salida', 'merma') NOT NULL,
+    cantidad DECIMAL(10,2) NOT NULL,
+    unidad VARCHAR(20) NOT NULL,
+    motivo VARCHAR(100) NULL,
+    fecha_movimiento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

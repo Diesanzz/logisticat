@@ -1,5 +1,6 @@
 const inventoryTable = document.getElementById("inventoryTable");
 const productForm = document.getElementById("productForm");
+const movementsTable = document.getElementById("movementsTable");
 
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
@@ -12,6 +13,7 @@ const mermaTotal = document.getElementById("mermaTotal");
 
 const API_URL = "http://localhost:3000/api/productos";
 const REPORTES_URL = "http://localhost:3000/api/reportes/resumen";
+const MOVIMIENTOS_URL = "http://localhost:3000/api/movimientos";
 
 let productos = [];
 let mermasRegistradas = 0;
@@ -85,6 +87,7 @@ async function obtenerProductosDesdeAPI() {
 
         productos = datos.productos;
         renderizarInventario();
+        await obtenerMovimientosDesdeAPI();
 
     } catch (error) {
         console.error("Error al obtener productos:", error);
@@ -165,7 +168,7 @@ function renderizarInventario() {
             </td>
             <td>
                 <button class="merma-btn" onclick="registrarMerma(${producto.id})">
-                    Registrar merma
+                    Registrar salida
                 </button>
             </td>
         `;
@@ -221,8 +224,59 @@ async function obtenerResumenDesdeAPI() {
     }
 }
 
+async function obtenerMovimientosDesdeAPI() {
+    try {
+        const respuesta = await fetch(MOVIMIENTOS_URL);
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            alert(datos.message || "Error al obtener movimientos.");
+            return;
+        }
+
+        renderizarMovimientos(datos.movimientos);
+
+    } catch (error) {
+        console.error("Error al obtener movimientos:", error);
+        alert("No se pudo conectar con la API de movimientos.");
+    }
+}
+
+function renderizarMovimientos(movimientos) {
+    movementsTable.innerHTML = "";
+
+    if (movimientos.length === 0) {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td colspan="S">No hay movimientos registrados todavía.</td>
+        `;
+
+        movementsTable.appendChild(row);
+        return;
+    }
+
+    movimientos.forEach((movimientos) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${movimientos.nombreProducto}</td>
+            <td>
+                <span class="type-badge ${movimientos.tipo}">
+                    ${movimientos.tipo}
+                </span>
+            </td>
+            <td>${movimientos.cantidad} ${movimientos.unidad}</td>
+            <td>${movimientos.motivo || "Sin motivo"}</td>
+            <td>${formatearFecha(movimientos.fechaMovimiento)}</td>
+        `;
+
+        movementsTable.appendChild(row);
+    });
+}
+
 async function registrarMerma(idProducto) {
-    const motivo = prompt("Motivo de la merma: consumo, daño o caducidad");
+    const motivo = prompt("Motivo de la salida: consumo, daño o caducidad");
 
     if (!motivo) {
         return;
