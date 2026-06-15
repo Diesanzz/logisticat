@@ -5,6 +5,8 @@ const movementsTable = document.getElementById("movementsTable");
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
 const closeModalBtn = document.getElementById("closeModalBtn");
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -30,6 +32,14 @@ productModal.addEventListener("click", (event) => {
     if (event.target === productModal) {
         productModal.classList.remove("show");
     }
+});
+
+searchInput.addEventListener("input", () => {
+    renderizarInventario();    
+});
+
+statusFilter.addEventListener("change", () => {
+    renderizarInventario();
 });
 
 productForm.addEventListener("submit", async (event) => {
@@ -136,6 +146,18 @@ function obtenerEstado(diasRestantes) {
     };
 }
 
+function obtenerClaveEstado(diasRestantes) {
+    if (diasRestantes < 0) {
+        return "vencido";
+    }
+
+    if (diasRestantes <= 7) {
+        return "por-caducar";
+    }
+
+    return "activo";
+}
+
 function formatearFecha(fecha) {
     const fechaObj = new Date(fecha);
 
@@ -149,7 +171,35 @@ function formatearFecha(fecha) {
 function renderizarInventario() {
     inventoryTable.innerHTML = "";
 
-    productos.forEach((producto) => {
+    const busqueda = searchInput.value.toLowerCase().trim();
+    const filtroEstado = statusFilter.value;
+
+    const productosFiltrados = productos.filter((producto) => {
+        const diasRestantes = calcularDiasRestantes(producto.fechaCaducidad);
+        const claveEstado = obtenerClaveEstado(diasRestantes);
+
+        const coincideBusqueda = producto.nombre
+            .toLowerCase()
+            .includes(busqueda);
+
+        const coincideEstado = filtroEstado === "todos" || filtroEstado === claveEstado;
+
+        return coincideBusqueda && coincideEstado;
+    });
+
+    if (productosFiltrados.length === 0) {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td colspan="7">No se encontraron productos con esos filtros.</td>
+        `;
+
+        inventoryTable.appendChild(row);
+        obtenerResumenDesdeAPI();
+        return;
+    }
+
+    productosFiltrados.forEach((producto) => {
         const diasRestantes = calcularDiasRestantes(producto.fechaCaducidad);
         const estado = obtenerEstado(diasRestantes);
 
