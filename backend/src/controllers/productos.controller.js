@@ -88,6 +88,88 @@ async function crearProducto(req, res) {
     }
 }
 
+async function actualizarProducto(req, res) {
+    try {
+        const id = Number(req.params.id);
+
+        const {
+            nombre,
+            cantidad,
+            unidad,
+            fechaIngreso,
+            fechaCaducidad
+        } = req.body;
+
+        if (!nombre || !cantidad || !unidad || !fechaIngreso || !fechaCaducidad) {
+            return res.status(400).json({
+                ok: false,
+                message: "Todos los campos son obligatorios."
+            });
+        }
+
+        if (Number(cantidad) <= 0) {
+            return res.status(400).json({
+                ok: false,
+                message: "La cantidad debe ser mayor a cero."
+            });
+        }
+
+        if(new Date(fechaCaducidad) < new Date(fechaIngreso)) {
+            return res.status(400).json({
+                ok: false,
+                message: "La fecha de caducidad no puede ser menor que la fecha de caducidad."
+            });
+        }
+
+        const [resultado] = await pool.query(`
+            UPDATE productos
+            SET
+                nombre = ?,
+                cantidad = ?,
+                unidad = ?,
+                fecha_ingreso = ?,
+                fecha_caducidad = ?
+            WHERE id_producto = ?
+            `, [
+                nombre,
+                cantidad,
+                unidad,
+                fechaIngreso,
+                fechaCaducidad,
+                id
+            ]);
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({
+                ok: false,
+                message: "Producto no encontrado."
+            });
+        }
+
+        await pool.query(`
+            INSERT INTO movimientos (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
+            VALUES (?, ?, 'entrada', ?, ?, ?)
+            `, [
+                id,
+                nombre,
+                cantidad,
+                unidad,
+                "Actualización de producto"
+            ]);
+
+        res.json({
+            ok: true,
+            message: "Producto actualizado correctamente."
+        });        
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            message: "Error al actualizar producto",
+            error: error.message
+        });
+    }
+}
+
 async function registrarMerma(req, res) {
     try {
         const id = Number(req.params.id);
@@ -196,6 +278,7 @@ async function eliminarProducto(req, res) {
 module.exports = {
     obtenerProductos,
     crearProducto,
+    actualizarProducto,
     registrarMerma,
     eliminarProducto
 };
