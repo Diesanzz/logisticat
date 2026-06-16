@@ -276,7 +276,15 @@ td {
     color: var(--red-text);
 }
 
-.merma-btn {
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.merma-btn,
+.edit-btn {
     border: none;
     background-color: #f5ece3;
     color: var(--brown-dark);
@@ -286,7 +294,8 @@ td {
     font-weight: 600;
 }
 
-.merma-btn:hover {
+.merma-btn:hover,
+.edit-btn:hover {
     background-color: #ead8c5;
 }
 

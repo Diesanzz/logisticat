@@ -19,6 +19,7 @@ const MOVIMIENTOS_URL = "http://localhost:3000/api/movimientos";
 
 let productos = [];
 let mermasRegistradas = 0;
+let productoEditandoId = null;
 
 openModalBtn.addEventListener("click", () => {
     productModal.classList.add("show");
@@ -59,8 +60,14 @@ productForm.addEventListener("submit", async (event) => {
     }
 
     try {
-        const respuesta = await fetch(API_URL, {
-            method: "POST",
+        const url = productoEditandoId
+            ? `${API_URL}/${productoEditandoId}`
+            : API_URL;
+
+        const metodo = productoEditandoId ? "PUT" : "POST";
+
+        const respuesta = await fetch(url, {
+            method: metodo,
             headers: {
                 "Content-Type": "application/json"
             },
@@ -73,10 +80,11 @@ productForm.addEventListener("submit", async (event) => {
             alert(datos.message || "Error al registrar el producto.");
             return;
         }
-
+        
         productForm.reset();
+        productoEditandoId = null;
         productModal.classList.remove("show");
-
+    
         await obtenerProductosDesdeAPI();
 
     } catch (error) {
@@ -168,6 +176,16 @@ function formatearFecha(fecha) {
     return `${dia}/${mes}/${anio}`;
 }
 
+function convertirFechaParaInput(fecha) {
+    const fechaObj = new Date(fecha);
+
+    const anio = fechaObj.getFullYear();
+    const mes = String(fechaObj.getMonth() + 1).padStart(2, "0");
+    const dia = String(fechaObj.getDate()).padStart(2, "0");
+
+    return `${anio}-${mes}-${dia}`;
+}
+
 function renderizarInventario() {
     inventoryTable.innerHTML = "";
 
@@ -217,9 +235,15 @@ function renderizarInventario() {
                 </span>
             </td>
             <td>
-                <button class="merma-btn" onclick="registrarMerma(${producto.id})">
-                    Registrar salida
-                </button>
+                <div class="action-buttons">
+                    <button class="edit-btn" onclick="abrirFormularioEdicion(${producto.id})">
+                        Editar
+                    </button>
+
+                    <button class="merma-btn" onclick="registrarMerma(${producto.id})">
+                        Registrar salida
+                    </button>
+                </div>
             </td>
         `;
 
@@ -323,6 +347,25 @@ function renderizarMovimientos(movimientos) {
 
         movementsTable.appendChild(row);
     });
+}
+
+function abrirFormularioEdicion(idProducto) {
+    const producto = productos.find((item) => item.id === idProducto);
+
+    if (!producto) {
+        alert("Producto no  encontrado.");
+        return;
+    }
+
+    productoEditandoId = idProducto;
+
+    document.getElementById("nombre").value = producto.nombre;
+    document.getElementById("cantidad").value = producto.cantidad;
+    document.getElementById("unidad").value = producto.unidad;
+    document.getElementById("fechaIngreso").value = convertirFechaParaInput(producto.fechaIngreso);
+    document.getElementById("fechaCaducidad").value = convertirFechaParaInput(producto.fechaCaducidad);
+
+    productModal.classList.add("show");
 }
 
 async function registrarMerma(idProducto) {

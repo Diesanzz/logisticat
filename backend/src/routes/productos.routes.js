@@ -4,12 +4,14 @@ const router = express.Router();
 const {
     obtenerProductos,
     crearProducto,
+    actualizarProducto,
     registrarMerma,
     eliminarProducto
 } = require("../controllers/productos.controller");
 
 router.get("/", obtenerProductos);
 router.post("/", crearProducto);
+router.put("/:id", actualizarProducto);
 router.post("/:id/merma", registrarMerma);
 router.delete("/:id", eliminarProducto);
 
