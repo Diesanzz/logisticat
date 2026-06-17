@@ -59,6 +59,31 @@
             </article>
         </section>
 
+        <section class="alerts-section" id="alertas">
+            <div class="section-header">
+                <div>
+                    <h2>Alertas de caducidad</h2>
+                    <p>Productos vencidos o próximos a vencer en los siguientes 7 días</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Caducidad</th>
+                            <th>Días restantes</th>
+                            <th>Nivel</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="alertsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
         <section class="inventory-section">
             <div class="section-header">
                 <div>
@@ -169,7 +194,7 @@
 
             <div class="report-progress">
                 <div class="report-progress-header">
-                    <span>nivel de merma registrado</span>
+                    <span>Nivel de merma registrado</span>
                     <strong id="barraMermaTexto">0%</strong>
                 </div>
 

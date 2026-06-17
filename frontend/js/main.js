@@ -2,6 +2,7 @@ const inventoryTable = document.getElementById("inventoryTable");
 const productForm = document.getElementById("productForm");
 const movementsTable = document.getElementById("movementsTable");
 const toastContainer = document.getElementById("toastContainer");
+const alertsTable = document.getElementById("alertsTable");
 
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
@@ -27,6 +28,7 @@ const barraMermaTexto = document.getElementById("barraMermaTexto")
 const API_URL = "http://localhost:3000/api/productos";
 const REPORTES_URL = "http://localhost:3000/api/reportes/resumen";
 const MOVIMIENTOS_URL = "http://localhost:3000/api/movimientos";
+const ALERTAS_URL = "http://localhost:3000/api/alertas/caducidad";
 
 let productos = [];
 let mermasRegistradas = 0;
@@ -156,12 +158,82 @@ async function obtenerProductosDesdeAPI() {
 
         productos = datos.productos;
         renderizarInventario();
+        await obtenerAlertasDesdeAPI();
         await obtenerMovimientosDesdeAPI();
 
     } catch (error) {
         console.error("Error al obtener productos:", error);
         mostrarToast("No se pudo conectar con el backend. Revisa que npm run dev esté activo.", "error");
     }
+}
+
+async function obtenerAlertasDesdeAPI() {
+    try {
+        const respuesta = await fetch(ALERTAS_URL);
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "Error al obtener alertas.", "error");
+            return;
+        }
+
+        renderizarAlertas(datos.alertas);
+
+    } catch (error) {
+        console.error("Error al obtener alertas:", error);
+        mostrarToast("No se pudo conectar con la API de alertas.", "error");
+    }
+}
+
+function renderizarAlertas(alertas) {
+    alertsTable.innerHTML = "";
+
+    if (alertas.length === 0) {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td colspan="5" class="empty-alerts">
+                No hay productos próximos a caducar.
+            </td>
+        `;
+
+        alertsTable.appendChild(row);
+        return;
+    }
+
+    alertas.forEach((producto) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${producto.nombre}</td>
+            <td>${producto.cantidad} ${producto.unidad}</td>
+            <td>${formatearFecha(producto.fechaCaducidad)}</td>
+            <td>${producto.diasRestantes}</td>
+            <td>
+                <span class="alert-badge ${producto.nivelAlerta}">
+                    ${formatearNivelAlerta(producto.nivelAlerta)}
+                </span>
+            </td>
+        `;
+
+        alertsTable.appendChild(row);
+    });
+}
+
+function formatearNivelAlerta(nivel) {
+    if (nivel === "vencido") {
+        return "Vencido";
+    }
+
+    if (nivel === "critico") {
+        return "Crítico";
+    }
+
+    if (nivel === "advertencia") {
+        return "Advertencia";
+    }
+
+    return "Vigente";
 }
 
 function calcularDiasRestantes(fechaCaducidad) {
