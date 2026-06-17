@@ -133,6 +133,52 @@
             </div>
         </section>
 
+        <section class="reports-section">
+            <div class="section-header">
+                <div>
+                    <h2>Reportes</h2>
+                    <p>Resumen visual del estado actual del inventario</p>
+                </div>
+            </div>
+
+            <div class="reports-grid">
+                <article class="report-card">
+                    <span class="report-label">Productos activos</span>
+                    <strong id="productosActivosReporte">0</strong>
+                    <p>Productos disponibles y vigentes.</p>
+                </article>
+
+                <article class="report-card">
+                    <span class="report-label">Productos por caducar</span>
+                    <strong id="productosPorCaducarReporte">0</strong>
+                    <p>Insumos que deben priorizarse.</p>
+                </article>
+
+                <article class="report-card">
+                    <span class="report-label">Productos vencidos</span>
+                    <strong id="productosVencidosReporte">0</strong>
+                    <p>Productos que requieren atención inmediata.</p>
+                </article>
+
+                <article class="report-card">
+                    <span class="report-label">Porcentaje de merma</span>
+                    <strong id="porcentajeMermaReporte">0%</strong>
+                    <p>Relacion entre mermas y productos registrados.</p>
+                </article>
+            </div>
+
+            <div class="report-progress">
+                <div class="report-progress-header">
+                    <span>nivel de merma registrado</span>
+                    <strong id="barraMermaTexto">0%</strong>
+                </div>
+
+                <div class="progress-bar">
+                    <div id="barraMerma" class="progress-fill"></div>
+                </div>
+            </div>
+        </section>
+
         <section class="insights-section">
             <h2>Insights y recomendaciones</h2>
 
