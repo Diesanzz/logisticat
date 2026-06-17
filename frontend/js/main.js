@@ -17,6 +17,12 @@ const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
 const vencidos = document.getElementById("vencidos");
 const mermaTotal = document.getElementById("mermaTotal");
+const productosActivosReporte = document.getElementById("productosActivosReporte");
+const productosPorCaducarReporte = document.getElementById("productosPorCaducarReporte");
+const productosVencidosReporte = document.getElementById("productosVencidosReporte");
+const porcentajeMermaReporte = document.getElementById("porcentajeMermaReporte");
+const barraMerma = document.getElementById("barraMerma");
+const barraMermaTexto = document.getElementById("barraMermaTexto")
 
 const API_URL = "http://localhost:3000/api/productos";
 const REPORTES_URL = "http://localhost:3000/api/reportes/resumen";
@@ -137,8 +143,6 @@ function mostrarToast(mensaje, tipo = "info") {
         toast.remove();
     }, 3500);
 }
-
-mostrarToast("Prueba de que esta madre sirve", "error");
 
 async function obtenerProductosDesdeAPI() {
     try {
@@ -334,11 +338,19 @@ async function obtenerResumenDesdeAPI() {
         }
 
         const resumen = datos.resumen;
+        const productosActivos = resumen.totalProductos - resumen.productosPorCaducar - resumen.productosVencidos;
 
         totalProductos.textContent = resumen.totalProductos;
         porCaducar.textContent = resumen.productosPorCaducar;
         vencidos.textContent = resumen.productosVencidos;
         mermaTotal.textContent = `${resumen.porcentajeMerma}%`;
+        productosActivosReporte.textContent = productosActivos;
+        productosPorCaducarReporte.textContent = resumen.productosPorCaducar;
+        productosVencidosReporte.textContent = resumen.productosVencidos;
+        porcentajeMermaReporte.textContent = `${resumen.porcentajeMerma}%`;
+
+        barraMerma.style.width = `${resumen.porcentajeMerma}%`;
+        barraMermaTexto.textContent = `${resumen.porcentajeMerma}%`;
     } catch (error) {
         console.error("Error al obtener resumen:", error);
         mostrarToast("No se pudo conectar con la API de reportes.", "error");
