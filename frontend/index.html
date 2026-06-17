@@ -198,6 +198,36 @@
             </form>
         </div>
     </div>
+    
+    <div id="movementModal" class="modal">
+        <div class="modal-content small-modal">
+            <button id="closeMovementModalBtn" class="close-btn">
+                ×
+            </button>
+
+            <h2>Registrar salida</h2>
+            <p>Seleciona el motivo por el que el producto saldrá del inventario.</p>
+        
+            <form id="movementForm">
+                <div class="form-group">
+                    <label for="motivoSalida">Motivo de salida</label>
+                    <select id="motivoSalida" required>
+                        <option value="">Selecciona un motivo</option>
+                        <option value="consumo">Consumo</option>
+                        <option value="daño">Daño</option>
+                        <option value="caducidad">Caducidad</option>
+                    </select>
+                </div>
+        
+                <button type="submit" class="primary-btn full-btn">
+                    Confirmar salida
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="toastContainer" class="toast-container"></div>
 
     <script src="js/main.js"></script>
 </body>

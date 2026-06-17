@@ -478,6 +478,72 @@ select:focus {
     border-color: var(--caramel);
 }
 
+.small-modal {
+    max-width: 430px;
+}
+
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    min-width: 280px;
+    max-width: 360px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    color: var(--white);
+    font-weight: 700;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    animation: slideIn 0.25s ease;
+}
+
+.toast.success {
+    background-color: #318b38;
+}
+
+.toast.error {
+    background-color: #c23a3a;
+}
+
+.toast.warning {
+    background-color: #b18b00;
+}
+
+.toast.info {
+    background-color: var(--brown-dark);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 760px) {
+    .toast-container {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+    }
+
+    .toast {
+        min-width: auto;
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 1000px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);

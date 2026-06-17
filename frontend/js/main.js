@@ -1,12 +1,17 @@
 const inventoryTable = document.getElementById("inventoryTable");
 const productForm = document.getElementById("productForm");
 const movementsTable = document.getElementById("movementsTable");
+const toastContainer = document.getElementById("toastContainer");
 
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const searchInput = document.getElementById("searchInput");
 const statusFilter = document.getElementById("statusFilter");
+const movementModal = document.getElementById("movementModal");
+const movementForm = document.getElementById("movementForm");
+const closeMovementModalBtn = document.getElementById("closeMovementModalBtn");
+const motivoSalida = document.getElementById("motivoSalida");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -20,6 +25,7 @@ const MOVIMIENTOS_URL = "http://localhost:3000/api/movimientos";
 let productos = [];
 let mermasRegistradas = 0;
 let productoEditandoId = null;
+let productoSalidaId = null;
 
 openModalBtn.addEventListener("click", () => {
     productModal.classList.add("show");
@@ -55,7 +61,7 @@ productForm.addEventListener("submit", async (event) => {
     };
 
     if (new Date(nuevoProducto.fechaCaducidad) < new Date(nuevoProducto.fechaIngreso)) {
-        alert("La fecha de caducidad no puede ser menor que la fecha de ingreso.");
+        mostrarToast("La fecha de caducidad no puede ser menor que la fecha de ingreso.", "error");
         return;
     }
 
@@ -77,21 +83,62 @@ productForm.addEventListener("submit", async (event) => {
         const datos = await respuesta.json();
 
         if (!respuesta.ok) {
-            alert(datos.message || "Error al registrar el producto.");
+            mostrarToast(datos.message || "Error al registrar el producto.", "error");
             return;
         }
-        
+
+        const mensajeExito = productoEditandoId
+            ? "Producto actualizado correctamente."
+            : "Producto registrado correctamente.";
+
         productForm.reset();
         productoEditandoId = null;
         productModal.classList.remove("show");
-    
+
+        mostrarToast(mensajeExito, "success");
+
         await obtenerProductosDesdeAPI();
 
     } catch (error) {
         console.error("Error al conectar con el backend:", error);
-        alert("No se pudo conectar con el servidor. Revisa que el backend esté encendido.");
+        mostrarToast("No se pudo conectar con el servidor. Revisa que el backend esté encendido.", "error");
     }
 });
+
+closeMovementModalBtn.addEventListener("click", () => {
+    movementModal.classList.remove("show");
+    productoSalidaId = null;
+});
+
+movementModal.addEventListener("click", (event) => {
+    if (event.target === movementModal) {
+        movementModal.classList.remove("show");
+        productoSalidaId = null;
+    }
+});
+
+movementForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await confirmarSalida();
+})
+
+function mostrarToast(mensaje, tipo = "info") {
+
+    console.log("TOAST LLAMADO:", mensaje, tipo);
+    
+    const toast = document.createElement("div");
+
+    toast.className = `toast ${tipo}`;
+    toast.textContent = mensaje;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3500);
+}
+
+mostrarToast("Prueba de que esta madre sirve", "error");
 
 async function obtenerProductosDesdeAPI() {
     try {
@@ -99,7 +146,7 @@ async function obtenerProductosDesdeAPI() {
         const datos = await respuesta.json();
 
         if (!respuesta.ok) {
-            alert(datos.message || "Error al obtener productos.");
+            mostrarToast(datos.message || "Error al obtener productos.", "error");
             return;
         }
 
@@ -109,7 +156,7 @@ async function obtenerProductosDesdeAPI() {
 
     } catch (error) {
         console.error("Error al obtener productos:", error);
-        alert("No se pudo conectar con el backend. Revisa que npm run dev esté activo.");
+        mostrarToast("No se pudo conectar con el backend. Revisa que npm run dev esté activo.", "error");
     }
 }
 
@@ -282,7 +329,7 @@ async function obtenerResumenDesdeAPI() {
         const datos = await respuesta.json();
 
         if (!respuesta.ok) {
-            alert(datos.message || "Error al obtener el resumen del dashboard.");
+            mostrarToast(datos.message || "Error al obtener el resumen del dashboard.", "error");
             return;
         }
 
@@ -294,7 +341,7 @@ async function obtenerResumenDesdeAPI() {
         mermaTotal.textContent = `${resumen.porcentajeMerma}%`;
     } catch (error) {
         console.error("Error al obtener resumen:", error);
-        alert("No se pudo conectar con la API de reportes.");
+        mostrarToast("No se pudo conectar con la API de reportes.", "error");
     }
 }
 
@@ -304,7 +351,7 @@ async function obtenerMovimientosDesdeAPI() {
         const datos = await respuesta.json();
 
         if (!respuesta.ok) {
-            alert(datos.message || "Error al obtener movimientos.");
+            mostrarToast(datos.message || "Error al obtener movimientos.", "error");
             return;
         }
 
@@ -312,7 +359,7 @@ async function obtenerMovimientosDesdeAPI() {
 
     } catch (error) {
         console.error("Error al obtener movimientos:", error);
-        alert("No se pudo conectar con la API de movimientos.");
+        mostrarToast("No se pudo conectar con la API de movimientos.", "error");
     }
 }
 
@@ -353,7 +400,7 @@ function abrirFormularioEdicion(idProducto) {
     const producto = productos.find((item) => item.id === idProducto);
 
     if (!producto) {
-        alert("Producto no  encontrado.");
+        mostrarToast("Producto no encontrado.", "error");
         return;
     }
 
@@ -368,49 +415,49 @@ function abrirFormularioEdicion(idProducto) {
     productModal.classList.add("show");
 }
 
-async function registrarMerma(idProducto) {
-    const motivo = prompt("Motivo de la salida: consumo, daño o caducidad");
+function registrarMerma(idProducto) {
+    productoSalidaId = idProducto;
+    motivoSalida.value = "";
+    movementModal.classList.add("show");
+}
+
+async function confirmarSalida() {
+    const motivo = motivoSalida.value;
 
     if (!motivo) {
-        return;
-    }
-
-    const motivoNormalizado = motivo.toLowerCase().trim();
-
-    if (
-        motivoNormalizado !== "consumo" &&
-        motivoNormalizado !== "daño" &&
-        motivoNormalizado !== "caducidad"
-    ) {
-        alert("Motivo inválido. Usa: consumo, daño o caducidad.");
+        mostrarToast("Selecciona un motivo de salida.", "warning");
         return;
     }
 
     try {
-        const respuesta = await fetch(`${API_URL}/${idProducto}/merma`, {
+        const respuesta = await fetch(`${API_URL}/${productoSalidaId}/merma`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                motivo: motivoNormalizado
+                motivo
             })
         });
 
         const datos = await respuesta.json();
 
         if (!respuesta.ok) {
-            alert(datos.message || "Error al registrar merma.");
+            mostrarToast(datos.message || "Error al registrar salida.", "error");
             return;
         }
 
-        mermasRegistradas++;
+        movementForm.reset();
+        productoSalidaId = null;
+        movementModal.classList.remove("show");
+
+        mostrarToast("Salida registrada correctamente.", "success");
 
         await obtenerProductosDesdeAPI();
 
     } catch (error) {
-        console.error("Error al registrar merma:", error);
-        alert("No se pudo conectar con el servidor.");
+        console.error("Error al registrar salida:", error);
+        mostrarToast("No se pudo conectar con el servidor.", "error");
     }
 }
 
