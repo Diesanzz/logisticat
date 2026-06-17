@@ -138,8 +138,6 @@ function mostrarToast(mensaje, tipo = "info") {
     }, 3500);
 }
 
-mostrarToast("Prueba de que esta madre sirve", "error");
-
 async function obtenerProductosDesdeAPI() {
     try {
         const respuesta = await fetch(API_URL);
