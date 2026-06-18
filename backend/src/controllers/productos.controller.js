@@ -172,19 +172,36 @@ async function actualizarProducto(req, res) {
 
 async function registrarMerma(req, res) {
     try {
-        const id = Number(req.params.id);
-        const { motivo } = req.body;
+        const { id } = req.params;
+        const { motivo, cantidad } = req.body;
 
-        const motivosValidos = ["consumo", "daño", "caducidad"];
-
-        if (!motivo || !motivosValidos.includes(motivo.toLowerCase().trim())) {
+        if (!motivo) {
             return res.status(400).json({
                 ok: false,
-                message: "Motivo inválido. Usa: consumo, daño o caducidad"
+                message: "El motivo de salida es obligatorio"
             });
         }
 
-        const [productos] = await pool.query(`
+        if (!cantidad || Number(cantidad) <= 0) {
+            return res.status(400).json({
+                ok: false,
+                message: "La cantidad a retirar debe ser mayor a 0"
+            });
+        }
+
+        const motivoNormalizado = motivo.toLowerCase();
+
+        const motivosValidos = ["consumo", "daño", "caducidad"];
+
+        if (!motivosValidos.includes(motivoNormalizado)) {
+            return res.status(400).json({
+                ok: false,
+                message: "Motivo de salida no válido"
+            });
+        }
+
+        const [productos] = await pool.query(
+            `
             SELECT 
                 id_producto,
                 nombre,
@@ -192,7 +209,9 @@ async function registrarMerma(req, res) {
                 unidad
             FROM productos
             WHERE id_producto = ?
-        `, [id]);
+            `,
+            [id]
+        );
 
         if (productos.length === 0) {
             return res.status(404).json({
@@ -202,45 +221,84 @@ async function registrarMerma(req, res) {
         }
 
         const producto = productos[0];
-        const motivoNormalizado = motivo.toLowerCase().trim();
+
+        const cantidadActual = Number(producto.cantidad);
+        const cantidadRetirar = Number(cantidad);
+
+        if (cantidadRetirar > cantidadActual) {
+            return res.status(400).json({
+                ok: false,
+                message: `No puedes retirar ${cantidadRetirar} ${producto.unidad}. Solo hay ${cantidadActual} ${producto.unidad} disponibles.`
+            });
+        }
+
         const tipoMovimiento = motivoNormalizado === "consumo" ? "salida" : "merma";
 
-        await pool.query(`
-            INSERT INTO mermas (id_producto, nombre_producto, cantidad, unidad, motivo)
-            VALUES (?, ?, ?, ?, ?)
-        `, [
-            producto.id_producto,
-            producto.nombre,
-            producto.cantidad,
-            producto.unidad,
-            motivoNormalizado
-        ]);
-
-        await pool.query(`
-            INSERT INTO movimientos (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
+        await pool.query(
+            `
+            INSERT INTO movimientos 
+            (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
             VALUES (?, ?, ?, ?, ?, ?)
-        `, [
-            producto.id_producto,
-            producto.nombre,
-            tipoMovimiento,
-            producto.cantidad,
-            producto.unidad,
-            motivoNormalizado
-        ]);
+            `,
+            [
+                producto.id_producto,
+                producto.nombre,
+                tipoMovimiento,
+                cantidadRetirar,
+                producto.unidad,
+                motivoNormalizado
+            ]
+        );
 
-        await pool.query(`
-            DELETE FROM productos
-            WHERE id_producto = ?
-        `, [id]);
+        if (tipoMovimiento === "merma") {
+            await pool.query(
+                `
+                INSERT INTO mermas 
+                (id_producto, nombre_producto, cantidad, unidad, motivo)
+                VALUES (?, ?, ?, ?, ?)
+                `,
+                [
+                    producto.id_producto,
+                    producto.nombre,
+                    cantidadRetirar,
+                    producto.unidad,
+                    motivoNormalizado
+                ]
+            );
+        }
+
+        if (cantidadRetirar === cantidadActual) {
+            await pool.query(
+                `
+                DELETE FROM productos
+                WHERE id_producto = ?
+                `,
+                [id]
+            );
+        } else {
+            const nuevaCantidad = cantidadActual - cantidadRetirar;
+
+            await pool.query(
+                `
+                UPDATE productos
+                SET cantidad = ?
+                WHERE id_producto = ?
+                `,
+                [nuevaCantidad, id]
+            );
+        }
 
         res.json({
             ok: true,
-            message: "Merma registrada correctamente"
+            message: "Salida registrada correctamente"
         });
+
     } catch (error) {
+        console.error("Error al registrar salida:", error);
+
         res.status(500).json({
             ok: false,
-            message: "Error al registrar merma",
+            message: "Error al registrar salida",
             error: error.message
         });
     }
