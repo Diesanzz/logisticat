@@ -21,6 +21,8 @@ const cancelMovementBtn = document.getElementById("cancelMovementBtn");
 const productModalTitle = document.getElementById("productModalTitle");
 const productModalDescription = document.getElementById("productModalDescription");
 const saveProductBtn = document.getElementById("saveProductBtn");
+const movementSearchInput = document.getElementById("movementSearchInput");
+const movementTypeFilter = document.getElementById("movementTypeFilter");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -42,6 +44,7 @@ let productos = [];
 let mermasRegistradas = 0;
 let productoEditandoId = null;
 let productoSalidaId = null;
+let movimientos = [];
 
 openModalBtn.addEventListener("click", () => {
     productoEditandoId = null;
@@ -68,8 +71,16 @@ searchInput.addEventListener("input", () => {
     renderizarInventario();    
 });
 
+movementSearchInput.addEventListener("input", () => {    
+    movementSearchInput.addEventListener("input", renderizarMovimientos);
+});
+
 statusFilter.addEventListener("change", () => {
     renderizarInventario();
+});
+
+movementTypeFilter.addEventListener("change", () => {
+    movementTypeFilter.addEventListener("change", renderizarMovimientos);
 });
 
 cancelProductBtn.addEventListener("click", () => {
@@ -156,6 +167,9 @@ movementForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     await confirmarSalida();
 })
+
+
+
 
 function mostrarToast(mensaje, tipo = "info") {
 
@@ -466,7 +480,8 @@ async function obtenerMovimientosDesdeAPI() {
             return;
         }
 
-        renderizarMovimientos(datos.movimientos);
+        movimientos = datos.movimientos;
+        renderizarMovimientos();
 
     } catch (error) {
         console.error("Error al obtener movimientos:", error);
@@ -474,37 +489,65 @@ async function obtenerMovimientosDesdeAPI() {
     }
 }
 
-function renderizarMovimientos(movimientos) {
+function renderizarMovimientos() {
     movementsTable.innerHTML = "";
 
-    if (movimientos.length === 0) {
+    const busqueda = movementSearchInput.value.toLowerCase().trim();
+    const filtroTipo = movementTypeFilter.value;
+
+    const movimientosFiltrados = movimientos.filter((movimiento) => {
+        const nombreProducto = movimiento.nombreProducto.toLowerCase();
+
+        const coincideBusqueda = nombreProducto.includes(busqueda);
+        const coincideTipo = filtroTipo === "todos" || movimiento.tipo === filtroTipo;
+
+        return coincideBusqueda && coincideTipo;
+    });
+
+    if (movimientosFiltrados.length === 0) {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-            <td colspan="S">No hay movimientos registrados todavía.</td>
+            <td colspan="6">No se encontraron movimientos con esos filtros.</td>
         `;
 
         movementsTable.appendChild(row);
         return;
     }
 
-    movimientos.forEach((movimientos) => {
+    movimientosFiltrados.forEach((movimiento) => {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-            <td>${movimientos.nombreProducto}</td>
+            <td>${movimiento.nombreProducto}</td>
             <td>
-                <span class="type-badge ${movimientos.tipo}">
-                    ${movimientos.tipo}
+                <span class="type-badge ${movimiento.tipo}">
+                    ${formatearTipoMovimiento(movimiento.tipo)}
                 </span>
             </td>
-            <td>${movimientos.cantidad} ${movimientos.unidad}</td>
-            <td>${movimientos.motivo || "Sin motivo"}</td>
-            <td>${formatearFecha(movimientos.fechaMovimiento)}</td>
+            <td>${movimiento.cantidad} ${movimiento.unidad}</td>
+            <td>${movimiento.motivo || "Sin motivo"}</td>
+            <td>${formatearFecha(movimiento.fechaMovimiento)}</td>
         `;
 
         movementsTable.appendChild(row);
     });
+}
+
+function formatearTipoMovimiento(tipo) {
+    if (tipo === "entrada") {
+        return "Entrada";
+    }
+
+    if (tipo === "salida") {
+        return "Salida";
+    }
+
+    if (tipo === "merma") {
+        return "Merma";
+    }
+
+    return tipo;
 }
 
 function abrirFormularioEdicion(idProducto) {
