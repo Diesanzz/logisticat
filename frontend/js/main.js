@@ -16,6 +16,11 @@ const motivoSalida = document.getElementById("motivoSalida");
 const cantidadSalida = document.getElementById("cantidadSalida");
 const productoSalidaNombre = document.getElementById("productoSalidaNombre");
 const productoSalidaStock = document.getElementById("productoSalidaStock");
+const cancelProductBtn = document.getElementById("cancelProductBtn");
+const cancelMovementBtn = document.getElementById("cancelMovementBtn");
+const productModalTitle = document.getElementById("productModalTitle");
+const productModalDescription = document.getElementById("productModalDescription");
+const saveProductBtn = document.getElementById("saveProductBtn");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -39,6 +44,13 @@ let productoEditandoId = null;
 let productoSalidaId = null;
 
 openModalBtn.addEventListener("click", () => {
+    productoEditandoId = null;
+
+    productModalTitle.textContent = "Agregar producto";
+    productModalDescription.textContent = "Registra un nuevo insumo dentro del inventario.";
+    saveProductBtn.textContent = "Guardar producto";
+
+    productForm.reset();
     productModal.classList.add("show");
 });
 
@@ -58,6 +70,18 @@ searchInput.addEventListener("input", () => {
 
 statusFilter.addEventListener("change", () => {
     renderizarInventario();
+});
+
+cancelProductBtn.addEventListener("click", () => {
+    productForm.reset();
+    productoEditandoId = null;
+    productModal.classList.remove("show");
+});
+
+cancelMovementBtn.addEventListener("click", () => {
+    movementForm.reset();
+    productoSalidaId = null;
+    movementModal.classList.remove("show");
 });
 
 productForm.addEventListener("submit", async (event) => {
@@ -499,6 +523,10 @@ function abrirFormularioEdicion(idProducto) {
     document.getElementById("fechaIngreso").value = convertirFechaParaInput(producto.fechaIngreso);
     document.getElementById("fechaCaducidad").value = convertirFechaParaInput(producto.fechaCaducidad);
 
+    productModalTitle.textContent = "Editar producto";
+    productModalDescription.textContent = "Actualiza la información del insumo seleccionado.";
+    saveProductBtn.textContent = "Guardar cambios";
+    
     productModal.classList.add("show");
 }
 
