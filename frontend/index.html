@@ -220,104 +220,143 @@
     </main>
 
     <div id="productModal" class="modal">
-        <div class="modal-content">
-            <button id="closeModalBtn" class="close-btn">×</button>
-
-            <h2>Agregar productos</h2>
-            <p>Registra un nuevo insumo en el inventario.</p>
-
-            <form id="productForm">
-                <div class="form-group">
-                    <label for="nombre">Nombre del producto</label>
-                    <input type="text" id="nombre" placeholder="Ej. Leche entera 1L" required>
+        <div class="modal-content product-modal">
+            <div class="modal-header">
+                <div>
+                    <span class="modal-kicker">Inventario</span>
+                    <h2 id="productModalTitle">Agregar Producto</h2>
+                    <p id="productModalDescription">
+                        Registra un nuevo insumo dentro del inventario.
+                    </p>   
                 </div>
+    
+                <button id="closeModalBtn" class="close-btn">×</button>
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="cantidad">Cantidad</label>
-                        <input type="number" id="cantidad" min="1" placeholder="Ej. 10" required>
+            <form id="productForm" class="styled-form">
+                <div class="form-section">
+                    <h3>Información del producto</h3>
+
+                    <div class="form-group full-field">
+                        <label for="nombre">Nombre del producto</label>
+                        <input type="text" id="nombre" required placeholder="Ej. Leche entera 1L">
                     </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cantidad">Cantidad</label>
+                            <input type="number" id="cantidad" min="0.01" step=0.1 required placeholder="Ej. 10">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="unidad">Unidad</label>
+                            <select id="unidad" required>
+                                <option value="">Selecciona unidad</option>
+                                <option value="kg">Kilogramos</option>
+                                <option value="g">Gramos</option>
+                                <option value="L">Litros</option>
+                                <option value="ml">Mililitros</option>
+                                <option value="pieza">Pieza</option>
+                                <option value="paquete">Paquete</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                     
-                    <div class="form-group">
-                        <label for="unidad">Unidad</label>
-                        <select id="unidad" required>
-                            <option value="">Selecciona</option>
-                            <option value="pieza">Pieza</option>
-                            <option value="kg">Kg</option>
-                            <option value="g">g</option>
-                            <option value="L">L</option>
-                            <option value="ml">ml</option>
-                        </select>
+                <div class="form-section">
+                    <h3>Fechas de control</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fechaIngreso">Fecha de ingreso</label>
+                            <input type="date" id="fechaIngreso" required>
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="fechaCaducidad">Fecha de caducidad</label>
+                            <input type="date" id="fechaCaducidad" required>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="fechaIngreso">Fecha de ingreso</label>
-                        <input type="date" id="fechaIngreso" required>
-                    </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelProductBtn" class="secondary-btn">
+                        Cancelar
+                    </button>
 
-                    <div class="form-group">
-                        <label for="fechaCaducidad">Fecha de caducidad</label>
-                        <input type="date" id="fechaCaducidad" required>
-                    </div>
+                    <button type="submit" id="saveProductBtn" class="primary-btn">
+                        Guardar producto
+                    </button>
                 </div>
-
-                <button type="submit" class="primary-btn full=btn">
-                    Guardar producto
-                </button>
             </form>
         </div>
     </div>
     
     <div id="movementModal" class="modal">
-        <div class="modal-content small-modal">
-            <button id="closeMovementModalBtn" class="close-btn">×</button>
+        <div class="modal-content movement-modal">
+            <div class="modal-header">
+                <div>
+                    <span class="modal-kicker">Movimiento</span>
+                    <h2>Registrar salida</h2>
+                    <p>Indica la cantidad que saldrá del inventario y el motivo.</p>
+                </div>
 
-            <h2>Registrar salida</h2>
-            <p>Indica cuántas unidades saldrán del inventario y el motivo.</p>
+                <button id="closeMovementModalBtn" class="close-btn">×</button>
+            </div>
 
             <div class="movement-product-info">
-                <span>Producto seleccionado</span>
-                <strong id="productoSalidaNombre">---</strong>
+                <div>
+                    <span>Producto seleccionado</span>
+                    <strong id="productoSalidaNombre">---</strong>
+                </div>
+
                 <p>
                     Stock disponible:
                     <b id="productoSalidaStock">0</b>
                 </p>
             </div>
 
-            <form id="movementForm">
-                <div class="form-group">
-                    <label for="cantidadSalida">Cantidad a retirar</label>
-                    <input 
-                        type="number" 
-                        id="cantidadSalida" 
-                        min="0.01" 
-                        step="0.01" 
-                        required
-                        placeholder="Ej. 2"
-                    >
+            <form id="movementForm" class="styled-form">
+                <div class="form-section">
+                    <h3>Datos de salida</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cantidadSalida">Cantidad a retirar</label>
+                            <input 
+                                type="number" 
+                                id="cantidadSalida" 
+                                min="0.01" 
+                                step="0.01" 
+                                required 
+                                placeholder="Ej. 2"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="motivoSalida">Motivo</label>
+                            <select id="motivoSalida" required>
+                                <option value="">Selecciona motivo</option>
+                                <option value="consumo">Consumo</option>
+                                <option value="daño">Daño</option>
+                                <option value="caducidad">Caducidad</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="motivoSalida">Motivo de salida</label>
-                    <select id="motivoSalida" required>
-                        <option value="">Selecciona un motivo</option>
-                        <option value="consumo">Consumo</option>
-                        <option value="daño">Daño</option>
-                        <option value="caducidad">Caducidad</option>
-                    </select>
-                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelMovementBtn" class="secondary-btn">
+                        Cancelar
+                    </button>
 
-                <button type="submit" class="primary-btn full-btn">
-                    Confirmar salida
-                </button>
+                    <button type="submit" class="primary-btn">
+                        Confirmar salida
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
     <div id="toastContainer" class="toast-container"></div>
-
     <script src="js/main.js"></script>
 </body>
 </html>
