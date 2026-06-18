@@ -13,6 +13,9 @@ const movementModal = document.getElementById("movementModal");
 const movementForm = document.getElementById("movementForm");
 const closeMovementModalBtn = document.getElementById("closeMovementModalBtn");
 const motivoSalida = document.getElementById("motivoSalida");
+const cantidadSalida = document.getElementById("cantidadSalida");
+const productoSalidaNombre = document.getElementById("productoSalidaNombre");
+const productoSalidaStock = document.getElementById("productoSalidaStock");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -500,13 +503,46 @@ function abrirFormularioEdicion(idProducto) {
 }
 
 function registrarMerma(idProducto) {
+    const producto = productos.find((item) => item.id === idProducto);
+
+    if (!producto) {
+        mostrarToast("No se encontró el producto seleccionado.", "error");
+        return;
+    }
+
     productoSalidaId = idProducto;
+
+    productoSalidaNombre.textContent = producto.nombre;
+    productoSalidaStock.textContent = `${producto.cantidad} ${producto.unidad}`;
+
+    cantidadSalida.value = "";
+    cantidadSalida.max = producto.cantidad;
+
     motivoSalida.value = "";
+
     movementModal.classList.add("show");
 }
 
 async function confirmarSalida() {
     const motivo = motivoSalida.value;
+    const cantidad = Number(cantidadSalida.value);
+
+    const producto = productos.find((item) => item.id === productoSalidaId);
+
+    if (!producto) {
+        mostrarToast("No se encontró el producto seleccionado.", "error");
+        return;
+    }
+
+    if (!cantidad || cantidad <= 0) {
+        mostrarToast("La cantidad a retirar debe ser mayor a 0.", "warning");
+        return;
+    }
+
+    if (cantidad > Number(producto.cantidad)) {
+        mostrarToast(`No puedes retirar más de ${producto.cantidad} ${producto.unidad}.`, "error");
+        return;
+    }
 
     if (!motivo) {
         mostrarToast("Selecciona un motivo de salida.", "warning");
@@ -520,7 +556,8 @@ async function confirmarSalida() {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                motivo
+                motivo,
+                cantidad
             })
         });
 
@@ -535,7 +572,9 @@ async function confirmarSalida() {
         productoSalidaId = null;
         movementModal.classList.remove("show");
 
-        mostrarToast("Salida registrada correctamente.", "success");
+        setTimeout(() => {
+            mostrarToast("Salida registrada correctamente.", "success");
+        }, 100);
 
         await obtenerProductosDesdeAPI();
 

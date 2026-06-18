@@ -272,14 +272,33 @@
     
     <div id="movementModal" class="modal">
         <div class="modal-content small-modal">
-            <button id="closeMovementModalBtn" class="close-btn">
-                ×
-            </button>
+            <button id="closeMovementModalBtn" class="close-btn">×</button>
 
             <h2>Registrar salida</h2>
-            <p>Seleciona el motivo por el que el producto saldrá del inventario.</p>
-        
+            <p>Indica cuántas unidades saldrán del inventario y el motivo.</p>
+
+            <div class="movement-product-info">
+                <span>Producto seleccionado</span>
+                <strong id="productoSalidaNombre">---</strong>
+                <p>
+                    Stock disponible:
+                    <b id="productoSalidaStock">0</b>
+                </p>
+            </div>
+
             <form id="movementForm">
+                <div class="form-group">
+                    <label for="cantidadSalida">Cantidad a retirar</label>
+                    <input 
+                        type="number" 
+                        id="cantidadSalida" 
+                        min="0.01" 
+                        step="0.01" 
+                        required
+                        placeholder="Ej. 2"
+                    >
+                </div>
+
                 <div class="form-group">
                     <label for="motivoSalida">Motivo de salida</label>
                     <select id="motivoSalida" required>
@@ -289,14 +308,13 @@
                         <option value="caducidad">Caducidad</option>
                     </select>
                 </div>
-        
+
                 <button type="submit" class="primary-btn full-btn">
                     Confirmar salida
                 </button>
             </form>
         </div>
     </div>
-
 
     <div id="toastContainer" class="toast-container"></div>
 
