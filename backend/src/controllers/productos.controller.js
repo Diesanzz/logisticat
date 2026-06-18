@@ -44,6 +44,13 @@ async function crearProducto(req, res) {
             });
         }
 
+        if (Number(cantidad) <= 0) {
+            return res.status(400).json({
+                ok: false,
+                message: "La cantidad debe ser mayor a 0"
+            });
+        }
+
         if (new Date(fechaCaducidad) < new Date(fechaIngreso)) {
             return res.status(400).json({
                 ok: false,
@@ -51,35 +58,125 @@ async function crearProducto(req, res) {
             });
         }
 
-        const [resultado] = await pool.query(`
-            INSERT INTO productos (nombre, cantidad, unidad, fecha_ingreso, fecha_caducidad)
-            VALUES (?, ?, ?, ?, ?)
-        `, [nombre, cantidad, unidad, fechaIngreso, fechaCaducidad]);
+        const nombreLimpio = nombre.trim();
 
-        await pool.query(`
-            INSERT INTO movimientos (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
+        const [productosExistentes] = await pool.query(
+            `
+            SELECT 
+                id_producto,
+                nombre,
+                cantidad,
+                unidad,
+                fecha_ingreso,
+                fecha_caducidad
+            FROM productos
+            WHERE LOWER(TRIM(nombre)) = LOWER(TRIM(?))
+            AND unidad = ?
+            AND fecha_caducidad = ?
+            LIMIT 1
+            `,
+            [nombreLimpio, unidad, fechaCaducidad]
+        );
+
+        if (productosExistentes.length > 0) {
+            const productoExistente = productosExistentes[0];
+
+            const nuevaCantidad = Number(productoExistente.cantidad) + Number(cantidad);
+
+            await pool.query(
+                `
+                UPDATE productos
+                SET 
+                    cantidad = ?,
+                    fecha_ingreso = CASE
+                        WHEN fecha_ingreso <= ? THEN fecha_ingreso
+                        ELSE ?
+                    END
+                WHERE id_producto = ?
+                `,
+                [
+                    nuevaCantidad,
+                    fechaIngreso,
+                    fechaIngreso,
+                    productoExistente.id_producto
+                ]
+            );
+
+            await pool.query(
+                `
+                INSERT INTO movimientos 
+                (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
+                VALUES (?, ?, 'entrada', ?, ?, ?)
+                `,
+                [
+                    productoExistente.id_producto,
+                    productoExistente.nombre,
+                    cantidad,
+                    unidad,
+                    "Entrada agregada a producto existente"
+                ]
+            );
+
+            return res.json({
+                ok: true,
+                message: "Producto existente actualizado: se sumó la cantidad al stock",
+                producto: {
+                    id: productoExistente.id_producto,
+                    nombre: productoExistente.nombre,
+                    cantidad: nuevaCantidad,
+                    unidad,
+                    fechaIngreso,
+                    fechaCaducidad
+                }
+            });
+        }
+
+        const [resultado] = await pool.query(
+            `
+            INSERT INTO productos 
+            (nombre, cantidad, unidad, fecha_ingreso, fecha_caducidad)
+            VALUES (?, ?, ?, ?, ?)
+            `,
+            [
+                nombreLimpio,
+                cantidad,
+                unidad,
+                fechaIngreso,
+                fechaCaducidad
+            ]
+        );
+
+        await pool.query(
+            `
+            INSERT INTO movimientos 
+            (id_producto, nombre_producto, tipo, cantidad, unidad, motivo)
             VALUES (?, ?, 'entrada', ?, ?, ?)
-        `, [
-            resultado.insertId,
-            nombre,
-            cantidad,
-            unidad,
-            "Registro inicial de producto"
-        ]);
+            `,
+            [
+                resultado.insertId,
+                nombreLimpio,
+                cantidad,
+                unidad,
+                "Registro inicial de producto"
+            ]
+        );
 
         res.status(201).json({
             ok: true,
-            message: "Producto creado correctamente",
+            message: "Producto registrado correctamente",
             producto: {
                 id: resultado.insertId,
-                nombre,
-                cantidad: Number(cantidad),
+                nombre: nombreLimpio,
+                cantidad,
                 unidad,
                 fechaIngreso,
                 fechaCaducidad
             }
         });
+
     } catch (error) {
+        console.error("Error al crear producto:", error);
+
         res.status(500).json({
             ok: false,
             message: "Error al crear producto",

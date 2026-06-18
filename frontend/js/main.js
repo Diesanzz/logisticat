@@ -124,7 +124,7 @@ productForm.addEventListener("submit", async (event) => {
 
         const mensajeExito = productoEditandoId
             ? "Producto actualizado correctamente."
-            : "Producto registrado correctamente.";
+            : datos.message || "Producto registrado correctamente.";
 
         productForm.reset();
         productoEditandoId = null;
