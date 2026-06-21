@@ -51,6 +51,15 @@ const closeProfileModalBtn = document.getElementById("closeProfileModalBtn");
 const profileName = document.getElementById("profileName");
 const profileEmail = document.getElementById("profileEmail");
 const profileRole = document.getElementById("profileRole");
+const openRegisterBtn = document.getElementById("openRegisterBtn");
+const registerModal = document.getElementById("registerModal");
+const closeRegisterModalBtn = document.getElementById("closeRegisterModalBtn");
+const cancelRegisterBtn = document.getElementById("cancelRegisterBtn");
+const registerForm = document.getElementById("registerForm");
+const registerNombre = document.getElementById("registerNombre");
+const registerCorreo = document.getElementById("registerCorreo");
+const registerPassword = document.getElementById("registerPassword");
+const registerRol = document.getElementById("registerRol");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -273,6 +282,33 @@ profileModal.addEventListener("click", (event) => {
     }
 });
 
+openRegisterBtn.addEventListener("click", () => {
+    registerForm.reset();
+    registerModal.classList.add("show");
+});
+
+closeRegisterModalBtn.addEventListener("click", () => {
+    registerModal.classList.remove("show");
+});
+
+cancelRegisterBtn.addEventListener("click", () => {
+    registerForm.reset();
+    registerModal.classList.remove("show");
+});
+
+registerModal.addEventListener("click", (event) => {
+    if (event.target === registerModal) {
+        registerModal.classList.remove("show");
+    }
+});
+
+registerForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await registrarUsuarioDesdeFrontend();
+});
+
+
+
 
 
 function mostrarToast(mensaje, tipo = "info") {
@@ -454,6 +490,54 @@ async function iniciarSesion() {
 
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
+        mostrarToast("No se pudo conectar con la API de autenticación.", "error");
+    }
+}
+
+async function registrarUsuarioDesdeFrontend() {
+    try {
+        const nuevoUsuario = {
+            nombre: registerNombre.value.trim(),
+            correo: registerCorreo.value.trim(),
+            password: registerPassword.value,
+            rol: registerRol.value
+        };
+
+        if (!nuevoUsuario.nombre || !nuevoUsuario.correo || !nuevoUsuario.password) {
+            mostrarToast("Completa todos los campos del registro.", "warning");
+            return;
+        }
+
+        if (nuevoUsuario.password.length < 6) {
+            mostrarToast("La contraseña debe tener al menos 6 caracteres.", "warning");
+            return;
+        }
+
+        const respuesta = await fetch(`${AUTH_URL}/registro`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(nuevoUsuario)
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "No se pudo registrar el usuario.", "error");
+            return;
+        }
+
+        registerForm.reset();
+        registerModal.classList.remove("show");
+
+        loginCorreo.value = nuevoUsuario.correo;
+        loginPassword.value = "";
+
+        mostrarToast("Usuario registrado correctamente. Ahora inicia sesión.", "success");
+
+    } catch (error) {
+        console.error("Error al registrar usuario:", error);
         mostrarToast("No se pudo conectar con la API de autenticación.", "error");
     }
 }
