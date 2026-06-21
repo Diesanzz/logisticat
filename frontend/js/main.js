@@ -3,6 +3,9 @@ const productForm = document.getElementById("productForm");
 const movementsTable = document.getElementById("movementsTable");
 const toastContainer = document.getElementById("toastContainer");
 const alertsTable = document.getElementById("alertsTable");
+const sidebar = document.querySelector(".sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const mainContent = document.querySelector(".main-content");
 
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
@@ -94,6 +97,11 @@ cancelMovementBtn.addEventListener("click", () => {
     movementForm.reset();
     productoSalidaId = null;
     movementModal.classList.remove("show");
+});
+
+sidebarToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+    mainContent.classList.toggle("expanded");
 });
 
 productForm.addEventListener("submit", async (event) => {

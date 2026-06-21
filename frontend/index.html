@@ -12,17 +12,43 @@
     <aside class="sidebar">
         <div class="brand">
             <div class="brand-icon">☕</div>
-            <h2>Logisticat</h2>
+
+            <div class="brand-text">
+                <h2>Logisticat</h2>
+                <span>Inventario café</span>
+            </div>
+
+            <button id="sidebarToggle" class="sidebar-toggle" type="button">
+                ☰
+            </button>
         </div>
 
         <nav class="menu">
-            <a href="#" class="menu-item active">☕ Dashboard</a>
-            <a href="#" class="menu-item">📦 Inventario</a>
+            <a href="#" class="menu-item active">
+                <span class="menu-icon">🏠</span>
+                <span class="menu-text">Dashboard</span>
+            </a>
+
+            <a href="#inventario" class="menu-item">
+                <span class="menu-icon">📦</span>
+                <span class="menu-text">Inventario</span>
+            </a>
+
             <a href="#alertas" class="menu-item alert-menu-item">
-                <span>🔔 Alertas</span>
+                <span class="menu-icon">🔔</span>
+                <span class="menu-text">Alertas</span>
                 <span id="alertBadge" class="alert-notification-badge hidden">0</span>
             </a>
-            <a href="#" class="menu-item">📊 Reportes</a>
+
+            <a href="#reportes" class="menu-item">
+                <span class="menu-icon">📊</span>
+                <span class="menu-text">Reportes</span>
+            </a>
+
+            <a href="#historial" class="menu-item">
+                <span class="menu-icon">🕘</span>
+                <span class="menu-text">Historial</span>
+            </a>
         </nav>
 
         <div class="user-card">
