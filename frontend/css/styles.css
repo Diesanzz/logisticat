@@ -975,8 +975,6 @@ select:focus {
     display: none;
 }
 
-/* Animations */
-
 @keyframes badgePulse {
     0% {
         transform: scale(1);
@@ -1002,8 +1000,6 @@ select:focus {
         transform: translateX(0);
     }
 }
-
-/* Responsive */
 
 @media (max-width: 1000px) {
     .stats-grid,
