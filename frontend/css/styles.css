@@ -577,6 +577,34 @@ tbody tr:hover {
     line-height: 1.5;
 }
 
+.recommendation-card {
+    border-left: 5px solid transparent;
+}
+
+.recommendation-card.success {
+    border-left-color: var(--green-text);
+}
+
+.recommendation-card.warning {
+    border-left-color: var(--yellow-text);
+}
+
+.recommendation-card.error {
+    border-left-color: var(--red-text);
+}
+
+.recommendation-card.info {
+    border-left-color: var(--caramel);
+}
+
+.insight-icon.red {
+    background-color: #ffd8d8;
+}
+
+.insight-icon.blue {
+    background-color: #dceeff;
+}
+
 .filters-bar {
     display: grid;
     grid-template-columns: 2fr 1fr;

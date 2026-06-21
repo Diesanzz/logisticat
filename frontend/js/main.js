@@ -6,6 +6,7 @@ const alertsTable = document.getElementById("alertsTable");
 const sidebar = document.querySelector(".sidebar");
 const sidebarToggle = document.getElementById("sidebarToggle");
 const mainContent = document.querySelector(".main-content");
+const recommendationsGrid = document.getElementById("recommendationsGrid");
 
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
@@ -43,6 +44,7 @@ const API_URL = "http://localhost:3000/api/productos";
 const REPORTES_URL = "http://localhost:3000/api/reportes/resumen";
 const MOVIMIENTOS_URL = "http://localhost:3000/api/movimientos";
 const ALERTAS_URL = "http://localhost:3000/api/alertas/caducidad";
+const RECOMENDACIONES_URL = "http://localhost:3000/api/recomendaciones";
 
 let productos = [];
 let mermasRegistradas = 0;
@@ -193,6 +195,63 @@ function mostrarToast(mensaje, tipo = "info") {
     }, 3500);
 }
 
+async function obtenerRecomendacionesDesdeAPI() {
+    try {
+        const respuesta = await fetch(RECOMENDACIONES_URL);
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "Error al obtener recomendaciones.", "error");
+            return;
+        }
+
+        renderizarRecomendaciones(datos.recomendaciones);
+
+    } catch (error) {
+        console.error("Error al obtener recomendaciones:", error);
+        mostrarToast("No se pudo conectar con la API de recomendaciones.", "error");
+    }
+}
+
+function renderizarRecomendaciones(recomendaciones) {
+    recommendationsGrid.innerHTML = "";
+
+    recomendaciones.forEach((recomendacion) => {
+        const card = document.createElement("article");
+
+        card.className = `insight-card recommendation-card ${recomendacion.tipo}`;
+
+        card.innerHTML = `
+            <div class="insight-icon ${obtenerClaseIconoRecomendacion(recomendacion.tipo)}">
+                ${recomendacion.icono}
+            </div>
+
+            <div>
+                <h3>${recomendacion.titulo}</h3>
+                <p>${recomendacion.mensaje}</p>
+            </div>
+        `;
+
+        recommendationsGrid.appendChild(card);
+    });
+}
+
+function obtenerClaseIconoRecomendacion(tipo) {
+    if (tipo === "success") {
+        return "green";
+    }
+
+    if (tipo === "warning") {
+        return "yellow";
+    }
+
+    if (tipo === "error") {
+        return "red";
+    }
+
+    return "blue";
+}
+
 async function obtenerProductosDesdeAPI() {
     try {
         const respuesta = await fetch(API_URL);
@@ -207,6 +266,7 @@ async function obtenerProductosDesdeAPI() {
         renderizarInventario();
         await obtenerAlertasDesdeAPI();
         await obtenerMovimientosDesdeAPI();
+        await obtenerRecomendacionesDesdeAPI();
 
     } catch (error) {
         console.error("Error al obtener productos:", error);
