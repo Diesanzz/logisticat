@@ -23,6 +23,7 @@ const productModalDescription = document.getElementById("productModalDescription
 const saveProductBtn = document.getElementById("saveProductBtn");
 const movementSearchInput = document.getElementById("movementSearchInput");
 const movementTypeFilter = document.getElementById("movementTypeFilter");
+const alertBadge = document.getElementById("alertBadge");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -168,9 +169,6 @@ movementForm.addEventListener("submit", async (event) => {
     await confirmarSalida();
 })
 
-
-
-
 function mostrarToast(mensaje, tipo = "info") {
 
     console.log("TOAST LLAMADO:", mensaje, tipo);
@@ -228,6 +226,7 @@ async function obtenerAlertasDesdeAPI() {
 
 function renderizarAlertas(alertas) {
     alertsTable.innerHTML = "";
+    actualizarBadgeAlertas(alertas);
 
     if (alertas.length === 0) {
         const row = document.createElement("tr");
@@ -259,6 +258,35 @@ function renderizarAlertas(alertas) {
 
         alertsTable.appendChild(row);
     });
+}
+
+function actualizarBadgeAlertas(alertas) {
+    const alertasVencidasOCriticas = alertas.filter((alerta) => {
+        return alerta.nivelAlerta === "vencido" || alerta.nivelAlerta === "critico";
+    });
+
+    const alertasAdvertencia = alertas.filter((alerta) => {
+        return alerta.nivelAlerta === "advertencia";
+    });
+
+    alertBadge.classList.remove("red", "yellow");
+
+    if (alertasVencidasOCriticas.length > 0) {
+        alertBadge.textContent = alertasVencidasOCriticas.length;
+        alertBadge.classList.add("red");
+        alertBadge.classList.remove("hidden");
+        return;
+    }
+
+    if (alertasAdvertencia.length > 0) {
+        alertBadge.textContent = alertasAdvertencia.length;
+        alertBadge.classList.add("yellow");
+        alertBadge.classList.remove("hidden");
+        return;
+    }
+
+    alertBadge.textContent = "0";
+    alertBadge.classList.add("hidden");
 }
 
 function formatearNivelAlerta(nivel) {
