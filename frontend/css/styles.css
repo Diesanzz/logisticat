@@ -1310,6 +1310,20 @@ select:focus {
     color: var(--caramel-dark)
 }
 
+.permission-hidden {
+    display: none !important;
+}
+
+.permission-notice {
+    background-color: #fff3c4;
+    color: var(--yellow-text);
+    border: 1px solid rgba(177, 139, 0, 0.22);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
 @keyframes badgePulse {
     0% {
         transform: scale(1);

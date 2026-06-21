@@ -404,6 +404,13 @@ async function obtenerConfiguracionDesdeAPI() {
 }
 
 async function guardarConfiguracionHistorial() {
+    const usuario = obtenerUsuarioSesion();
+
+    if (!usuario || usuario.rol !== "administrador") {
+        mostrarToast("Solo un administrador puede modificar la configuración.", "error");
+        return;
+    }
+
     try {
         const mesesHistorial = historyRetentionSelect.value;
 
@@ -433,6 +440,13 @@ async function guardarConfiguracionHistorial() {
 }
 
 async function limpiarHistorialAntiguo() {
+    const usuario = obtenerUsuarioSesion();
+
+    if (!usuario || usuario.rol !== "administrador") {
+        mostrarToast("Solo un administrador puede limpiar el historial.", "error");
+        return;
+    }
+
     try {
         const respuesta = await fetch(`${CONFIGURACION_URL}/historial/limpiar`, {
             method: "DELETE"
@@ -492,6 +506,18 @@ async function iniciarSesion() {
         console.error("Error al iniciar sesión:", error);
         mostrarToast("No se pudo conectar con la API de autenticación.", "error");
     }
+}
+
+function aplicarPermisos(usuario) {
+    const elementosAdmin = document.querySelectorAll(".admin-only");
+
+    elementosAdmin.forEach((elemento) => {
+        if (usuario.rol === "administrador") {
+            elemento.classList.remove("permission-hidden");
+        } else {
+            elemento.classList.add("permission-hidden");
+        }
+    });
 }
 
 async function registrarUsuarioDesdeFrontend() {
@@ -575,7 +601,11 @@ function mostrarApp(usuario) {
     appContainer.classList.remove("hidden");
 
     userNameDisplay.textContent = usuario.nombre;
-    userRoleDisplay.textContent = usuario.rol;
+    userRoleDisplay.textContent = usuario.rol === "administrador"
+        ? "Administrador"
+        : "Empleado";
+
+    aplicarPermisos(usuario);
 }
 
 function mostrarLogin() {

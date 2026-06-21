@@ -48,7 +48,7 @@
 
                 <p class="auth-switch-text">
                     ¿No tienes cuenta?
-                    <button type="button" id="openRegisterBtn" class="link-btn">
+                    <button type="button" id="openRegisterBtn" class="link-btn admin-register-option">
                         Crear cuenta
                     </button>
                 </p>
@@ -83,7 +83,7 @@
                     <span class="menu-text">Inventario</span>
                 </a>
     
-                <a href="#alertas" class="menu-item alert-menu-item">
+                <a href="#alertas" class="menu-item alert-menu-item admin-only">
                     <span class="menu-icon">🔔</span>
                     <span class="menu-text">Alertas</span>
                     <span id="alertBadge" class="alert-notification-badge hidden">0</span>
@@ -99,7 +99,7 @@
                     <span class="menu-text">Historial</span>
                 </a>
     
-                <a href="#configuracion" class="menu-item">
+                <a href="#configuracion" class="menu-item admin-only">
                     <span class="menu-icon">⚙️</span>
                     <span class="menu-text">Configuración</span>
                 </a>
@@ -120,7 +120,7 @@
                         Ver perfil
                     </button>
 
-                    <a href="#configuracion" class="dropdown-item">
+                    <a href="#configuracion" class="dropdown-item admin-only">
                         Configuración
                     </a>
 
@@ -325,7 +325,7 @@
                 </div>
             </section>
     
-            <section class="settings-section" id="configuracion">
+            <section class="settings-section admin-only" id="configuracion">
                 <div class="section-header">
                     <div>
                         <h2>Configuración</h2>
