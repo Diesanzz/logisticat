@@ -23,10 +23,10 @@
     --red-text: #c23a3a;
 
     --luxury-gradient: linear-gradient(135deg, #3e2b20 0%, #6f4e37 48%, #c58b40 100%);
-    --luxury-gradient--2: linear-gradient(135deg, var(--caramel) 80%, #6f4e37 100%, #3e2b20 100%);
+    --table-gradient: linear-gradient(135deg, #6f4e37 0%, #c58b40 100%);
     --gold-gradient: linear-gradient(135deg, #c58b40 0%, #f5c26b 100%);
-    --gold-gradient-btn: linear-gradient(135deg, #c58b40 0%, #f5c26b 100%);
     --soft-gradient: linear-gradient(135deg, #fff8ef 0%, #f8efe4 45%, #eadfd3 100%);
+
     --shadow-soft: 0 18px 45px rgba(62, 43, 32, 0.08);
     --shadow-strong: 0 24px 80px rgba(62, 43, 32, 0.22);
 }
@@ -61,6 +61,7 @@ body {
     position: fixed;
     left: 0;
     top: 0;
+    transition: width 0.25s ease, border-radius 0.25s ease;
 }
 
 .brand {
@@ -68,6 +69,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    position: relative;
 }
 
 .brand-icon {
@@ -80,11 +82,41 @@ body {
     place-items: center;
     font-size: 22px;
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+    flex-shrink: 0;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: opacity 0.2s ease;
 }
 
 .brand h2 {
     font-size: 20px;
     letter-spacing: 1px;
+}
+
+.brand-text span {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.sidebar-toggle {
+    margin-left: auto;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.14);
+    color: var(--white);
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.24);
 }
 
 .menu {
@@ -101,6 +133,19 @@ body {
     border-radius: 12px;
     font-size: 16px;
     transition: 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.menu-icon {
+    width: 24px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.menu-text {
+    transition: opacity 0.2s ease;
 }
 
 .menu-item.active {
@@ -141,10 +186,67 @@ body {
     font-size: 13px;
 }
 
+.sidebar.collapsed {
+    width: 86px;
+}
+
+.sidebar.collapsed .brand {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar.collapsed .brand-text,
+.sidebar.collapsed .menu-text,
+.sidebar.collapsed .user-card div {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-toggle {
+    position: static;
+    margin: 18px auto 0;
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--white);
+    box-shadow: none;
+}
+
+.sidebar.collapsed .menu {
+    padding: 20px 16px;
+    align-items: center;
+}
+
+.sidebar.collapsed .menu-item {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    justify-content: center;
+    position: relative;
+}
+
+.sidebar.collapsed .menu-item:hover {
+    transform: translateX(0) scale(1.05);
+}
+
+.sidebar.collapsed .user-card {
+    justify-content: center;
+    padding: 22px 18px;
+}
+
+.sidebar.collapsed .alert-notification-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+}
+
 .main-content {
     margin-left: 230px;
     width: calc(100% - 230px);
     padding: 36px 54px;
+    transition: margin-left 0.25s ease, width 0.25s ease;
+}
+
+.main-content.expanded {
+    margin-left: 86px;
+    width: calc(100% - 86px);
 }
 
 .page-header {
@@ -243,6 +345,18 @@ body {
     display: inline-block;
 }
 
+.section-header h2::after,
+.insights-section h2::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 54px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--gold-gradient);
+}
+
 .section-header p {
     color: var(--text-muted);
     margin-top: 12px;
@@ -250,7 +364,7 @@ body {
 
 .primary-btn {
     border: none;
-    background: var(--gold-gradient-btn);
+    background: var(--gold-gradient);
     color: var(--brown-dark);
     padding: 13px 24px;
     border-radius: 12px;
@@ -294,7 +408,7 @@ table {
 }
 
 thead {
-    background: var(--luxury-gradient--2);
+    background: var(--table-gradient);
 }
 
 th {
@@ -832,10 +946,6 @@ select:focus {
 
 .alert-menu-item {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
 }
 
 .alert-notification-badge {
@@ -865,13 +975,15 @@ select:focus {
     display: none;
 }
 
+/* Animations */
+
 @keyframes badgePulse {
     0% {
         transform: scale(1);
     }
 
     50% {
-        transform: scale(1.2);
+        transform: scale(1.15);
     }
 
     100% {
@@ -890,6 +1002,8 @@ select:focus {
         transform: translateX(0);
     }
 }
+
+/* Responsive */
 
 @media (max-width: 1000px) {
     .stats-grid,
@@ -914,16 +1028,31 @@ select:focus {
         border-radius: 0;
     }
 
+    .sidebar.collapsed {
+        width: 100%;
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+
     .menu {
         flex-direction: row;
         overflow-x: auto;
+        padding: 18px 20px;
+    }
+
+    .menu-item {
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .user-card {
         display: none;
     }
 
-    .main-content {
+    .main-content,
+    .main-content.expanded {
         margin-left: 0;
         width: 100%;
         padding: 28px 18px;
@@ -990,4 +1119,3 @@ select:focus {
         max-width: 100%;
     }
 }
-
