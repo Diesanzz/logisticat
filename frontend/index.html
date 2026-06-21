@@ -49,6 +49,11 @@
                 <span class="menu-icon">🕘</span>
                 <span class="menu-text">Historial</span>
             </a>
+
+            <a href="#configuracion" class="menu-item">
+                <span class="menu-icon">⚙️</span>
+                <span class="menu-text">Configuración</span>
+            </a>
         </nav>
 
         <div class="user-card">
@@ -254,6 +259,49 @@
             </div>
         </section>
 
+        <section class="settings-section" id="configuracion">
+            <div class="section-header">
+                <div>
+                    <h2>Configuración</h2>
+                    <p>Ajusta el comportamiento del historial de movimientos.</p>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="settings-info">
+                    <h3>Conservación del historial</h3>
+                    <p>
+                        Define cuánto tiempo se conservarán los movimientos registrados.
+                        Por defecto, Logisticat conserva el historial durante 3 meses.
+                    </p>
+                </div>
+
+                <form id="historySettingsForm" class="settings-form">
+                    <div class="form-group">
+                        <label for="historyRetentionSelect">Conservar historial durante</label>
+
+                        <select id="historyRetentionSelect" required>
+                            <option value="1">1 mes</option>
+                            <option value="2">2 meses</option>
+                            <option value="3">3 meses</option>
+                            <option value="6">6 meses</option>
+                            <option value="nunca">Nunca borrar</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button type="submit" class="primary-btn">
+                            Guardar configuración
+                        </button>
+
+                        <button type="button" id="cleanHistoryBtn" class="secondary-btn">
+                            Limpiar historial antiguo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
         <section class="insights-section" id="insights">
             <h2>Insights y recomendaciones</h2>
 
@@ -396,6 +444,38 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="confirmCleanModal" class="modal">
+        <div class="modal-content movement-modal">
+            <div class="modal-header">
+                <div>
+                    <span class="modal-kicker">Confirmación</span>
+                    <h2>Limpiar historial</h2>
+                    <p>Esta acción eliminará los movimientos antiguos según la configuración actual.</p>
+                </div>
+
+                <button id="closeConfirmCleanBtn" class="close-btn">×</button>
+            </div>
+
+            <div class="confirm-clean-content">
+                <h3>¿Seguro que quieres limpiar el historial antiguo?</h3>
+                <p>
+                    Los movimientos dentro del periodo configurado se conservarán.
+                    Los registros más antiguos serán eliminados.
+                </p>
+            </div>
+
+            <div class="modal-actions confirm-actions">
+                <button type="button" id="cancelCleanHistoryBtn" class="secondary-btn">
+                    Cancelar
+                </button>
+
+                <button type="button" id="confirmCleanHistoryBtn" class="danger-btn">
+                    Sí, limpiar historial
+                </button>
+            </div>
         </div>
     </div>
 

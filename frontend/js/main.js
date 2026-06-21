@@ -7,6 +7,9 @@ const sidebar = document.querySelector(".sidebar");
 const sidebarToggle = document.getElementById("sidebarToggle");
 const mainContent = document.querySelector(".main-content");
 const recommendationsGrid = document.getElementById("recommendationsGrid");
+const historySettingsForm = document.getElementById("historySettingsForm");
+const historyRetentionSelect = document.getElementById("historyRetentionSelect");
+const cleanHistoryBtn = document.getElementById("cleanHistoryBtn");
 
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
@@ -28,6 +31,10 @@ const saveProductBtn = document.getElementById("saveProductBtn");
 const movementSearchInput = document.getElementById("movementSearchInput");
 const movementTypeFilter = document.getElementById("movementTypeFilter");
 const alertBadge = document.getElementById("alertBadge");
+const confirmCleanModal = document.getElementById("confirmCleanModal");
+const closeConfirmCleanBtn = document.getElementById("closeConfirmCleanBtn");
+const cancelCleanHistoryBtn = document.getElementById("cancelCleanHistoryBtn");
+const confirmCleanHistoryBtn = document.getElementById("confirmCleanHistoryBtn");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -45,6 +52,7 @@ const REPORTES_URL = "http://localhost:3000/api/reportes/resumen";
 const MOVIMIENTOS_URL = "http://localhost:3000/api/movimientos";
 const ALERTAS_URL = "http://localhost:3000/api/alertas/caducidad";
 const RECOMENDACIONES_URL = "http://localhost:3000/api/recomendaciones";
+const CONFIGURACION_URL = "http://localhost:3000/api/configuracion";
 
 let productos = [];
 let mermasRegistradas = 0;
@@ -179,6 +187,36 @@ movementForm.addEventListener("submit", async (event) => {
     await confirmarSalida();
 })
 
+historySettingsForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await guardarConfiguracionHistorial();
+});
+
+cleanHistoryBtn.addEventListener("click", async () => {
+    confirmCleanModal.classList.add("show");
+});
+
+closeConfirmCleanBtn.addEventListener("click", () => {
+    confirmCleanModal.classList.remove("show");
+});
+
+cancelCleanHistoryBtn.addEventListener("click", () => {
+    confirmCleanModal.classList.remove("show");
+});
+
+confirmCleanModal.addEventListener("click", (event) => {
+    if (event.target === confirmCleanModal) {
+        confirmCleanModal.classList.remove("show");
+    }
+});
+
+confirmCleanHistoryBtn.addEventListener("click", async () => {
+    confirmCleanModal.classList.remove("show");
+    await limpiarHistorialAntiguo();
+});
+
+
+
 function mostrarToast(mensaje, tipo = "info") {
 
     console.log("TOAST LLAMADO:", mensaje, tipo);
@@ -250,6 +288,78 @@ function obtenerClaseIconoRecomendacion(tipo) {
     }
 
     return "blue";
+}
+
+async function obtenerConfiguracionDesdeAPI() {
+    try {
+        const respuesta = await fetch(CONFIGURACION_URL);
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "Error al obtener configuración.", "error");
+            return;
+        }
+
+        const mesesHistorial = datos.configuracion.meses_historial || "3";
+        historyRetentionSelect.value = mesesHistorial;
+
+    } catch (error) {
+        console.error("Error al obtener configuración:", error);
+        mostrarToast("No se pudo conectar con la API de configuración.", "error");
+    }
+}
+
+async function guardarConfiguracionHistorial() {
+    try {
+        const mesesHistorial = historyRetentionSelect.value;
+
+        const respuesta = await fetch(`${CONFIGURACION_URL}/historial`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                mesesHistorial
+            })
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "Error al guardar configuración.", "error");
+            return;
+        }
+
+        mostrarToast(datos.message || "Configuración guardada correctamente.", "success");
+
+    } catch (error) {
+        console.error("Error al guardar configuración:", error);
+        mostrarToast("No se pudo conectar con la API de configuración.", "error");
+    }
+}
+
+async function limpiarHistorialAntiguo() {
+    try {
+        const respuesta = await fetch(`${CONFIGURACION_URL}/historial/limpiar`, {
+            method: "DELETE"
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "Error al limpiar historial.", "error");
+            return;
+        }
+
+        mostrarToast(datos.message || "Historial limpiado correctamente.", "success");
+
+        await obtenerMovimientosDesdeAPI();
+        await obtenerRecomendacionesDesdeAPI();
+
+    } catch (error) {
+        console.error("Error al limpiar historial:", error);
+        mostrarToast("No se pudo conectar con la API de configuración.", "error");
+    }
 }
 
 async function obtenerProductosDesdeAPI() {
@@ -751,4 +861,5 @@ async function confirmarSalida() {
     }
 }
 
-obtenerProductosDesdeAPI(); 
+obtenerProductosDesdeAPI();
+obtenerConfiguracionDesdeAPI(); 

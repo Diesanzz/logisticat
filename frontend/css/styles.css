@@ -322,7 +322,8 @@ body {
 .insights-section,
 .history-section,
 .reports-section,
-.alerts-section {
+.alerts-section,
+.settings-section {
     background-color: rgba(255, 255, 255, 0.88);
     border: 1px solid rgba(197, 139, 64, 0.18);
     border-radius: 18px;
@@ -1003,6 +1004,78 @@ select:focus {
     display: none;
 }
 
+.settings-card {
+    background: linear-gradient(145deg, #ffffff 0%, #fff8ef 100%);
+    border: 1px solid rgba(197, 139, 64, 0.22);
+    border-radius: 18px;
+    padding: 26px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 28px;
+    align-items: center;
+}
+
+.settings-info h3 {
+    color: var(--brown-dark);
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.settings-info p {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.settings-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.confirm-clean-content {
+    padding: 28px 32px 10px;
+}
+
+.confirm-clean-content h3 {
+    color: var(--brown-dark);
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.confirm-clean-content p {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.confirm-actions {
+    padding: 12px 32px 32px;
+}
+
+.danger-btn {
+    border: none;
+    background: linear-gradient(135deg, #c23a3a 0%, #f06b6b 100%);
+    color: var(--white);
+    padding: 13px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 12px 26px rgba(194, 58, 58, 0.26);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.danger-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(194, 58, 58, 0.36);
+}
+
 @keyframes badgePulse {
     0% {
         transform: scale(1);
@@ -1141,5 +1214,25 @@ select:focus {
     .toast {
         min-width: auto;
         max-width: 100%;
+    }
+
+    .settings-card {
+    grid-template-columns: 1fr;
+    }
+
+    .settings-actions {
+        flex-direction: column;
+    }
+
+    .settings-actions button {
+        width: 100%;
+    }
+
+        .confirm-actions {
+        padding: 12px 24px 24px;
+    }
+
+    .danger-btn {
+        width: 100%;
     }
 }
