@@ -1291,6 +1291,25 @@ select:focus {
     word-break: break-word;
 }
 
+.auth-switch-text {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.link-btn {
+    border: none;
+    background: transparent;
+    color: var(--caramel);
+    font-weight: 900;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.link-btn:hover {
+    color: var(--caramel-dark)
+}
+
 @keyframes badgePulse {
     0% {
         transform: scale(1);
