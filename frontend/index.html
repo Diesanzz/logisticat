@@ -109,7 +109,7 @@
                 <span class="user-menu-arrow">▾</span>
 
                 <div id="userDropdown" class="user-dropdown hidden">
-                    <button type="button" class="dropdown-item">
+                    <button type="button" id="openProfileBtn" class="dropdown-item">
                         Ver perfil
                     </button>
 
@@ -535,6 +535,41 @@
                 <button type="button" id="confirmCleanHistoryBtn" class="danger-btn">
                     Sí, limpiar historial
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="profileModal" class="modal">
+        <div class="modal-content movement-modal">
+            <div class="modal-header">
+                <div>
+                    <span class="modal-kicker">Perfil</span>
+                    <h2>Información de usuario</h2>
+                    <p>Datos de la cuenta que inició sesión en Logisticat.</p>
+                </div>
+
+                <button id="closeProfileModalBtn" class="close-btn">×</button>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-avatar-large">☕</div>
+
+                <div class="profile-data">
+                    <div class="profile-row">
+                        <span>Nombre</span>
+                        <strong id="profileName">---</strong>
+                    </div>
+
+                    <div class="profile-row">
+                        <span>Correo</span>
+                        <strong id="profileEmail">---</strong>
+                    </div>
+
+                    <div class="profile-row">
+                        <span>Rol</span>
+                        <strong id="profileRole">---</strong>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

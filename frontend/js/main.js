@@ -45,6 +45,12 @@ const confirmCleanModal = document.getElementById("confirmCleanModal");
 const closeConfirmCleanBtn = document.getElementById("closeConfirmCleanBtn");
 const cancelCleanHistoryBtn = document.getElementById("cancelCleanHistoryBtn");
 const confirmCleanHistoryBtn = document.getElementById("confirmCleanHistoryBtn");
+const openProfileBtn = document.getElementById("openProfileBtn");
+const profileModal = document.getElementById("profileModal");
+const closeProfileModalBtn = document.getElementById("closeProfileModalBtn");
+const profileName = document.getElementById("profileName");
+const profileEmail = document.getElementById("profileEmail");
+const profileRole = document.getElementById("profileRole");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -253,6 +259,20 @@ document.addEventListener("click", () => {
     userMenuToggle.classList.remove("open");
 });
 
+openProfileBtn.addEventListener("click", () => {
+    abrirPerfilUsuario();
+});
+
+closeProfileModalBtn.addEventListener("click", () => {
+    profileModal.classList.remove("show");
+});
+
+profileModal.addEventListener("click", (event) => {
+    if (event.target === profileModal) {
+        profileModal.classList.remove("show");
+    }
+});
+
 
 
 function mostrarToast(mensaje, tipo = "info") {
@@ -436,6 +456,24 @@ async function iniciarSesion() {
         console.error("Error al iniciar sesión:", error);
         mostrarToast("No se pudo conectar con la API de autenticación.", "error");
     }
+}
+
+function abrirPerfilUsuario() {
+    const usuario = obtenerUsuarioSesion();
+
+    if (!usuario) {
+        mostrarToast("No hay una sesión activa.", "error");
+        return;
+    }
+
+    userDropdown.classList.add("hidden");
+    userMenuToggle.classList.remove("open");
+
+    profileName.textContent = usuario.nombre;
+    profileEmail.textContent = usuario.correo;
+    profileRole.textContent = usuario.rol;
+
+    profileModal.classList.add("show");
 }
 
 function obtenerUsuarioSesion() {
