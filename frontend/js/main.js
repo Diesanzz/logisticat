@@ -10,6 +10,16 @@ const recommendationsGrid = document.getElementById("recommendationsGrid");
 const historySettingsForm = document.getElementById("historySettingsForm");
 const historyRetentionSelect = document.getElementById("historyRetentionSelect");
 const cleanHistoryBtn = document.getElementById("cleanHistoryBtn");
+const loginScreen = document.getElementById("loginScreen");
+const appContainer = document.getElementById("appContainer");
+const loginForm = document.getElementById("loginForm");
+const loginCorreo = document.getElementById("loginCorreo");
+const loginPassword = document.getElementById("loginPassword");
+const logoutBtn = document.getElementById("logoutBtn");
+const userNameDisplay = document.getElementById("userNameDisplay");
+const userRoleDisplay = document.getElementById("userRoleDisplay");
+const userMenuToggle = document.getElementById("userMenuToggle");
+const userDropdown = document.getElementById("userDropdown");
 
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
@@ -53,6 +63,7 @@ const MOVIMIENTOS_URL = "http://localhost:3000/api/movimientos";
 const ALERTAS_URL = "http://localhost:3000/api/alertas/caducidad";
 const RECOMENDACIONES_URL = "http://localhost:3000/api/recomendaciones";
 const CONFIGURACION_URL = "http://localhost:3000/api/configuracion";
+const AUTH_URL = "http://localhost:3000/api/auth";
 
 let productos = [];
 let mermasRegistradas = 0;
@@ -215,6 +226,33 @@ confirmCleanHistoryBtn.addEventListener("click", async () => {
     await limpiarHistorialAntiguo();
 });
 
+loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await iniciarSesion();
+});
+
+logoutBtn.addEventListener("click", () => {
+    userDropdown.classList.add("hidden");
+    userMenuToggle.classList.remove("open");
+    cerrarSesion();
+});
+
+userMenuToggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    userDropdown.classList.toggle("hidden");
+    userMenuToggle.classList.toggle("open");
+});
+
+userDropdown.addEventListener("click", (event) => {
+    event.stopPropagation();
+});
+
+document.addEventListener("click", () => {
+    userDropdown.classList.add("hidden");
+    userMenuToggle.classList.remove("open");
+});
+
 
 
 function mostrarToast(mensaje, tipo = "info") {
@@ -360,6 +398,90 @@ async function limpiarHistorialAntiguo() {
         console.error("Error al limpiar historial:", error);
         mostrarToast("No se pudo conectar con la API de configuración.", "error");
     }
+}
+
+async function iniciarSesion() {
+    try {
+        const correo = loginCorreo.value.trim();
+        const password = loginPassword.value;
+
+        const respuesta = await fetch(`${AUTH_URL}/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                correo,
+                password
+            })
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "No se pudo iniciar sesión.", "error");
+            return;
+        }
+
+        localStorage.setItem("logisticat_user", JSON.stringify(datos.usuario));
+
+        loginForm.reset();
+        mostrarApp(datos.usuario);
+
+        mostrarToast(`Bienvenido, ${datos.usuario.nombre}.`, "success");
+
+        await cargarDatosIniciales();
+
+    } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+        mostrarToast("No se pudo conectar con la API de autenticación.", "error");
+    }
+}
+
+function obtenerUsuarioSesion() {
+    const usuarioGuardado = localStorage.getItem("logisticat_user");
+
+    if (!usuarioGuardado) {
+        return null;
+    }
+
+    return JSON.parse(usuarioGuardado);
+}
+
+function mostrarApp(usuario) {
+    loginScreen.classList.add("hidden");
+    appContainer.classList.remove("hidden");
+
+    userNameDisplay.textContent = usuario.nombre;
+    userRoleDisplay.textContent = usuario.rol;
+}
+
+function mostrarLogin() {
+    appContainer.classList.add("hidden");
+    loginScreen.classList.remove("hidden");
+}
+
+function cerrarSesion() {
+    localStorage.removeItem("logisticat_user");
+    mostrarLogin();
+    mostrarToast("Sesión cerrada correctamente.", "info");
+}
+
+async function cargarDatosIniciales() {
+    await obtenerProductosDesdeAPI();
+    await obtenerConfiguracionDesdeAPI();
+}
+
+function verificarSesionInicial() {
+    const usuario = obtenerUsuarioSesion();
+
+    if (!usuario) {
+        mostrarLogin();
+        return;
+    }
+
+    mostrarApp(usuario);
+    cargarDatosIniciales();
 }
 
 async function obtenerProductosDesdeAPI() {
@@ -861,5 +983,4 @@ async function confirmarSalida() {
     }
 }
 
-obtenerProductosDesdeAPI();
-obtenerConfiguracionDesdeAPI(); 
+verificarSesionInicial();

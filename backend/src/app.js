@@ -8,6 +8,7 @@ const movimientosRoutes = require("./routes/movimientos.routes");
 const alertasRoutes = require("./routes/alertas.routes");
 const recomendacionesRoutes = require("./routes/recomendaciones.routes");
 const configuracionRoutes = require("./routes/configuracion.routes");
+const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.use("/api/movimientos", movimientosRoutes);
 app.use("/api/alertas", alertasRoutes);
 app.use("/api/recomendaciones", recomendacionesRoutes);
 app.use("/api/configuracion", configuracionRoutes);
+app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
