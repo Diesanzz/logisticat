@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logisticat | Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
-
 </head>
-<body>
 
+<body>
     <section id="loginScreen" class="login-screen">
         <div class="login-card">
             <div class="login-brand">
                 <div class="brand-icon">☕</div>
+
                 <div>
                     <h1>Logisticat</h1>
                     <p>Control inteligente de inventario para cafeterías</p>
                 </div>
             </div>
-                
 
             <form id="loginForm" class="login-form">
                 <h2>Iniciar sesión</h2>
@@ -26,20 +25,22 @@
 
                 <div class="form-group">
                     <label for="loginCorreo">Correo</label>
-                    <input 
+                    <input
                         type="email"
                         id="loginCorreo"
                         required
-                        placeholder="admin@logisticat.com">
+                        placeholder="admin@logisticat.com"
+                    >
                 </div>
 
                 <div class="form-group">
                     <label for="loginPassword">Contraseña</label>
-                    <input 
+                    <input
                         type="password"
                         id="loginPassword"
                         required
-                        placeholder="Tu contraseña">
+                        placeholder="Tu contraseña"
+                    >
                 </div>
 
                 <button type="submit" class="primary-btn">
@@ -57,54 +58,53 @@
     </section>
 
     <div id="appContainer" class="app-container hidden">
-
         <aside class="sidebar">
             <div class="brand">
                 <div class="brand-icon">☕</div>
-    
+
                 <div class="brand-text">
                     <h2>Logisticat</h2>
                     <span>Inventario café</span>
                 </div>
-    
+
                 <button id="sidebarToggle" class="sidebar-toggle" type="button">
                     ☰
                 </button>
             </div>
-    
+
             <nav class="menu">
-                <a href="#" class="menu-item active">
+                <a href="#dashboard" class="menu-item active" data-page="dashboard">
                     <span class="menu-icon">🏠</span>
                     <span class="menu-text">Dashboard</span>
                 </a>
-    
-                <a href="#inventario" class="menu-item">
+
+                <a href="#inventario" class="menu-item" data-page="inventario">
                     <span class="menu-icon">📦</span>
                     <span class="menu-text">Inventario</span>
                 </a>
-    
-                <a href="#alertas" class="menu-item alert-menu-item admin-only">
+
+                <a href="#alertas" class="menu-item alert-menu-item" data-page="alertas">
                     <span class="menu-icon">🔔</span>
                     <span class="menu-text">Alertas</span>
                     <span id="alertBadge" class="alert-notification-badge hidden">0</span>
                 </a>
-    
-                <a href="#reportes" class="menu-item">
+
+                <a href="#reportes" class="menu-item" data-page="reportes">
                     <span class="menu-icon">📊</span>
                     <span class="menu-text">Reportes</span>
                 </a>
-    
-                <a href="#historial" class="menu-item">
+
+                <a href="#historial" class="menu-item" data-page="historial">
                     <span class="menu-icon">🕘</span>
                     <span class="menu-text">Historial</span>
                 </a>
-    
-                <a href="#configuracion" class="menu-item admin-only">
+
+                <a href="#configuracion" class="menu-item admin-only" data-page="configuracion">
                     <span class="menu-icon">⚙️</span>
                     <span class="menu-text">Configuración</span>
                 </a>
             </nav>
-    
+
             <div class="user-card" id="userMenuToggle">
                 <div class="avatar"></div>
 
@@ -120,7 +120,7 @@
                         Ver perfil
                     </button>
 
-                    <a href="#configuracion" class="dropdown-item admin-only">
+                    <a href="#configuracion" class="dropdown-item admin-only" data-dropdown-page="configuracion">
                         Configuración
                     </a>
 
@@ -130,78 +130,61 @@
                 </div>
             </div>
         </aside>
-    
+
         <main class="main-content">
-            <header class="page-header">
-                <h1>DASHBOARD</h1>
-                <p>Control de inventario, caducidades y merma para cafeterias</p>
-            </header>
-    
-            <section class="stats-grid">
-                <article class="stat-card border-brown">
-                    <span>Inventario total</span>
-                    <strong id="totalProductos">0</strong>
-                </article>
-    
-                <article class="stat-card border-yellow">
-                    <span>Por caducar</span>
-                    <strong id="porCaducar">0</strong>
-                </article>
-    
-                <article class="stat-card border-red">
-                    <span>Productos vencidos</span>
-                    <strong id="vencidos">0</strong>
-                </article>
-    
-                <article class="stat-card border-brown">
-                    <span>Merma total</span>
-                    <strong id="mermaTotal">0%</strong>
-                </article>
+            <section class="dashboard-section page-section active-page" id="dashboard">
+                <header class="page-header">
+                    <h1>DASHBOARD</h1>
+                    <p>Control de inventario, caducidades y merma para cafeterías</p>
+                </header>
+
+                <section class="stats-grid">
+                    <article class="stat-card border-brown">
+                        <span>Inventario total</span>
+                        <strong id="totalProductos">0</strong>
+                    </article>
+
+                    <article class="stat-card border-yellow">
+                        <span>Por caducar</span>
+                        <strong id="porCaducar">0</strong>
+                    </article>
+
+                    <article class="stat-card border-red">
+                        <span>Productos vencidos</span>
+                        <strong id="vencidos">0</strong>
+                    </article>
+
+                    <article class="stat-card border-brown">
+                        <span>Merma total</span>
+                        <strong id="mermaTotal">0%</strong>
+                    </article>
+                </section>
+
+                <section class="insights-section" id="insights">
+                    <h2>Insights y recomendaciones</h2>
+
+                    <div id="recommendationsGrid" class="insights-grid"></div>
+                </section>
             </section>
-    
-            <section class="alerts-section" id="alertas">
-                <div class="section-header">
-                    <div>
-                        <h2>Alertas de caducidad</h2>
-                        <p>Productos vencidos o próximos a vencer en los siguientes 7 días</p>
-                    </div>
-                </div>
-    
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Caducidad</th>
-                                <th>Días restantes</th>
-                                <th>Nivel</th>
-                            </tr>
-                        </thead>
-    
-                        <tbody id="alertsTable"></tbody>
-                    </table>
-                </div>
-            </section>
-    
-            <section class="inventory-section">
+
+            <section class="inventory-section page-section" id="inventario">
                 <div class="section-header">
                     <div>
                         <h2>Inventario</h2>
                         <p>Productos ordenados por fecha de caducidad</p>
                     </div>
-    
+
                     <button id="openModalBtn" class="primary-btn">
                         + Agregar producto
                     </button>
                 </div>
-    
+
                 <div class="filters-bar">
                     <div class="search-box">
                         <label for="searchInput">Buscar producto</label>
                         <input type="text" id="searchInput" placeholder="Ej. leche, café, queso...">
                     </div>
-    
+
                     <div class="filter-box">
                         <label for="statusFilter">Filtrar por estado</label>
                         <select id="statusFilter">
@@ -212,7 +195,7 @@
                         </select>
                     </div>
                 </div>
-    
+
                 <div class="table-container">
                     <table>
                         <thead>
@@ -226,30 +209,136 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-    
+
                         <tbody id="inventoryTable"></tbody>
                     </table>
                 </div>
             </section>
-    
-            <section class="history-section">
+
+            <section class="alerts-section page-section" id="alertas">
+                <div class="section-header">
+                    <div>
+                        <h2>Alertas de caducidad</h2>
+                        <p>Productos vencidos o próximos a vencer en los siguientes 7 días</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Caducidad</th>
+                                <th>Días restantes</th>
+                                <th>Nivel</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="alertsTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="reports-section page-section" id="reportes">
+                <div class="section-header">
+                    <div>
+                        <h2>Reportes</h2>
+                        <p>Resumen visual del estado actual del inventario</p>
+                    </div>
+                </div>
+
+                <div class="reports-grid">
+                    <article class="report-card">
+                        <span class="report-label">Productos activos</span>
+                        <strong id="productosActivosReporte">0</strong>
+                        <p>Productos disponibles y vigentes.</p>
+                    </article>
+
+                    <article class="report-card">
+                        <span class="report-label">Productos por caducar</span>
+                        <strong id="productosPorCaducarReporte">0</strong>
+                        <p>Insumos que deben priorizarse.</p>
+                    </article>
+
+                    <article class="report-card">
+                        <span class="report-label">Productos vencidos</span>
+                        <strong id="productosVencidosReporte">0</strong>
+                        <p>Productos que requieren atención inmediata.</p>
+                    </article>
+
+                    <article class="report-card">
+                        <span class="report-label">Porcentaje de merma</span>
+                        <strong id="porcentajeMermaReporte">0%</strong>
+                        <p>Relación entre mermas y productos registrados.</p>
+                    </article>
+                </div>
+
+                <div class="charts-grid">
+                    <article class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <span class="chart-kicker">Inventario</span>
+                                <h3>Estado de productos</h3>
+                            </div>
+                        </div>
+
+                        <canvas id="inventoryStatusChart"></canvas>
+                    </article>
+
+                    <article class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <span class="chart-kicker">Distribución</span>
+                                <h3>Productos por estado</h3>
+                            </div>
+                        </div>
+
+                        <canvas id="inventoryPieChart"></canvas>
+                    </article>
+
+                    <article class="chart-card chart-card-wide">
+                        <div class="chart-header">
+                            <div>
+                                <span class="chart-kicker">Movimientos</span>
+                                <h3>Entradas, salidas y mermas</h3>
+                            </div>
+                        </div>
+
+                        <canvas id="movementsChart"></canvas>
+                    </article>
+                </div>
+
+                <div class="report-progress">
+                    <div class="report-progress-header">
+                        <span>Nivel de merma registrado</span>
+                        <strong id="barraMermaTexto">0%</strong>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div id="barraMerma" class="progress-fill"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="history-section page-section" id="historial">
                 <div class="section-header">
                     <div>
                         <h2>Historial de movimientos</h2>
-                        <p>Registro de entradas y mermas del inventario</p>
+                        <p>Registro de entradas, salidas y mermas del inventario</p>
                     </div>
                 </div>
-    
+
                 <div class="filters-bar">
                     <div class="search-box">
                         <label for="movementSearchInput">Buscar movimiento</label>
-                        <input 
-                            type="text" 
-                            id="movementSearchInput" 
+                        <input
+                            type="text"
+                            id="movementSearchInput"
                             placeholder="Buscar por producto..."
                         >
                     </div>
-    
+
                     <div class="filter-box">
                         <label for="movementTypeFilter">Tipo de movimiento</label>
                         <select id="movementTypeFilter">
@@ -260,7 +349,7 @@
                         </select>
                     </div>
                 </div>
-    
+
                 <div class="table-container">
                     <table>
                         <thead>
@@ -272,67 +361,20 @@
                                 <th>Fecha</th>
                             </tr>
                         </thead>
-    
-                        <tbody id="movementsTable">
-                        </tbody>
+
+                        <tbody id="movementsTable"></tbody>
                     </table>
                 </div>
             </section>
-    
-            <section class="reports-section">
-                <div class="section-header">
-                    <div>
-                        <h2>Reportes</h2>
-                        <p>Resumen visual del estado actual del inventario</p>
-                    </div>
-                </div>
-    
-                <div class="reports-grid">
-                    <article class="report-card">
-                        <span class="report-label">Productos activos</span>
-                        <strong id="productosActivosReporte">0</strong>
-                        <p>Productos disponibles y vigentes.</p>
-                    </article>
-    
-                    <article class="report-card">
-                        <span class="report-label">Productos por caducar</span>
-                        <strong id="productosPorCaducarReporte">0</strong>
-                        <p>Insumos que deben priorizarse.</p>
-                    </article>
-    
-                    <article class="report-card">
-                        <span class="report-label">Productos vencidos</span>
-                        <strong id="productosVencidosReporte">0</strong>
-                        <p>Productos que requieren atención inmediata.</p>
-                    </article>
-    
-                    <article class="report-card">
-                        <span class="report-label">Porcentaje de merma</span>
-                        <strong id="porcentajeMermaReporte">0%</strong>
-                        <p>Relacion entre mermas y productos registrados.</p>
-                    </article>
-                </div>
-    
-                <div class="report-progress">
-                    <div class="report-progress-header">
-                        <span>Nivel de merma registrado</span>
-                        <strong id="barraMermaTexto">0%</strong>
-                    </div>
-    
-                    <div class="progress-bar">
-                        <div id="barraMerma" class="progress-fill"></div>
-                    </div>
-                </div>
-            </section>
-    
-            <section class="settings-section admin-only" id="configuracion">
+
+            <section class="settings-section page-section admin-only" id="configuracion">
                 <div class="section-header">
                     <div>
                         <h2>Configuración</h2>
                         <p>Ajusta el comportamiento del historial de movimientos.</p>
                     </div>
                 </div>
-    
+
                 <div class="settings-card">
                     <div class="settings-info">
                         <h3>Conservación del historial</h3>
@@ -341,11 +383,11 @@
                             Por defecto, Logisticat conserva el historial durante 3 meses.
                         </p>
                     </div>
-    
+
                     <form id="historySettingsForm" class="settings-form">
                         <div class="form-group">
                             <label for="historyRetentionSelect">Conservar historial durante</label>
-    
+
                             <select id="historyRetentionSelect" required>
                                 <option value="1">1 mes</option>
                                 <option value="2">2 meses</option>
@@ -354,24 +396,17 @@
                                 <option value="nunca">Nunca borrar</option>
                             </select>
                         </div>
-    
+
                         <div class="settings-actions">
                             <button type="submit" class="primary-btn">
                                 Guardar configuración
                             </button>
-    
+
                             <button type="button" id="cleanHistoryBtn" class="secondary-btn">
                                 Limpiar historial antiguo
                             </button>
                         </div>
                     </form>
-                </div>
-            </section>
-    
-            <section class="insights-section" id="insights">
-                <h2>Insights y recomendaciones</h2>
-    
-                <div id="recommendationsGrid" class="insights-grid">
                 </div>
             </section>
         </main>
@@ -385,9 +420,9 @@
                     <h2 id="productModalTitle">Agregar Producto</h2>
                     <p id="productModalDescription">
                         Registra un nuevo insumo dentro del inventario.
-                    </p>   
+                    </p>
                 </div>
-    
+
                 <button id="closeModalBtn" class="close-btn">×</button>
             </div>
 
@@ -399,12 +434,20 @@
                         <label for="nombre">Nombre del producto</label>
                         <input type="text" id="nombre" required placeholder="Ej. Leche entera 1L">
                     </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="cantidad">Cantidad</label>
-                            <input type="number" id="cantidad" min="0.01" step=0.01 required placeholder="Ej. 10">
+                            <input
+                                type="number"
+                                id="cantidad"
+                                min="0"
+                                step="any"
+                                required
+                                placeholder="Ej. 10"
+                            >
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="unidad">Unidad</label>
                             <select id="unidad" required>
@@ -419,15 +462,16 @@
                         </div>
                     </div>
                 </div>
-                    
+
                 <div class="form-section">
                     <h3>Fechas de control</h3>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="fechaIngreso">Fecha de ingreso</label>
                             <input type="date" id="fechaIngreso" required>
                         </div>
-    
+
                         <div class="form-group">
                             <label for="fechaCaducidad">Fecha de caducidad</label>
                             <input type="date" id="fechaCaducidad" required>
@@ -447,7 +491,7 @@
             </form>
         </div>
     </div>
-    
+
     <div id="movementModal" class="modal">
         <div class="modal-content movement-modal">
             <div class="modal-header">
@@ -479,12 +523,12 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="cantidadSalida">Cantidad a retirar</label>
-                            <input 
-                                type="number" 
-                                id="cantidadSalida" 
-                                min="0.01" 
-                                step="0.01" 
-                                required 
+                            <input
+                                type="number"
+                                id="cantidadSalida"
+                                min="0"
+                                step="any"
+                                required
                                 placeholder="Ej. 2"
                             >
                         </div>
@@ -599,30 +643,30 @@
 
                     <div class="form-group">
                         <label for="registerNombre">Nombre</label>
-                        <input 
-                            type="text" 
-                            id="registerNombre" 
-                            required 
+                        <input
+                            type="text"
+                            id="registerNombre"
+                            required
                             placeholder="Ej. Laura Riquelme"
                         >
                     </div>
 
                     <div class="form-group">
                         <label for="registerCorreo">Correo</label>
-                        <input 
-                            type="email" 
-                            id="registerCorreo" 
-                            required 
+                        <input
+                            type="email"
+                            id="registerCorreo"
+                            required
                             placeholder="usuario@logisticat.com"
                         >
                     </div>
 
                     <div class="form-group">
                         <label for="registerPassword">Contraseña</label>
-                        <input 
-                            type="password" 
-                            id="registerPassword" 
-                            required 
+                        <input
+                            type="password"
+                            id="registerPassword"
+                            required
                             minlength="6"
                             placeholder="Mínimo 6 caracteres"
                         >
@@ -651,6 +695,8 @@
     </div>
 
     <div id="toastContainer" class="toast-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
+
