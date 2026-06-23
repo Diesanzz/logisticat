@@ -43,6 +43,12 @@
                     >
                 </div>
 
+                <div class="forgot-password-box">
+                    <button type="button" id="openForgotPasswordBtn" class="link-btn">
+                        ¿Olvidaste tu contraseña?
+                    </button>
+                </div>
+
                 <button type="submit" class="primary-btn">
                     Entrar
                 </button>
@@ -120,7 +126,7 @@
                         Ver perfil
                     </button>
 
-                    <a href="#configuracion" class="dropdown-item admin-only" data-dropdown-page="configuracion">
+                    <a href="#configuracion" class="dropdown-item admin-only" data-page="configuracion">
                         Configuración
                     </a>
 
@@ -694,6 +700,107 @@
         </div>
     </div>
 
+    <div id="forgotPasswordModal" class="modal">
+    <div class="modal-content movement-modal">
+        <div class="modal-header">
+            <div>
+                <span class="modal-kicker">Recuperación</span>
+                <h2>Recuperar contraseña</h2>
+                <p>Ingresa tu correo para recibir un token de recuperación.</p>
+            </div>
+
+            <button id="closeForgotPasswordModalBtn" class="close-btn">×</button>
+                </div>
+
+                <form id="forgotPasswordForm" class="styled-form">
+                    <div class="form-section">
+                        <h3>Correo de la cuenta</h3>
+
+                        <div class="form-group">
+                            <label for="forgotCorreo">Correo</label>
+                            <input
+                                type="email"
+                                id="forgotCorreo"
+                                required
+                                placeholder="usuario@logisticat.com"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" id="cancelForgotPasswordBtn" class="secondary-btn">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="primary-btn">
+                            Enviar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="resetPasswordModal" class="modal">
+            <div class="modal-content movement-modal">
+                <div class="modal-header">
+                    <div>
+                        <span class="modal-kicker">Seguridad</span>
+                        <h2>Nueva contraseña</h2>
+                        <p>Ingresa el token recibido y define tu nueva contraseña.</p>
+                    </div>
+
+                    <button id="closeResetPasswordModalBtn" class="close-btn">×</button>
+                </div>
+
+                <form id="resetPasswordForm" class="styled-form">
+                    <div class="form-section">
+                        <h3>Datos de recuperación</h3>
+
+                        <div class="form-group">
+                            <label for="resetToken">Token</label>
+                            <input
+                                type="text"
+                                id="resetToken"
+                                required
+                                placeholder="Pega aquí el token"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resetPassword">Nueva contraseña</label>
+                            <input
+                                type="password"
+                                id="resetPassword"
+                                required
+                                minlength="6"
+                                placeholder="Mínimo 6 caracteres"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resetPasswordConfirm">Confirmar contraseña</label>
+                            <input
+                                type="password"
+                                id="resetPasswordConfirm"
+                                required
+                                minlength="6"
+                                placeholder="Repite la nueva contraseña"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" id="cancelResetPasswordBtn" class="secondary-btn">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="primary-btn">
+                            Cambiar contraseña
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     <div id="toastContainer" class="toast-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/main.js"></script>

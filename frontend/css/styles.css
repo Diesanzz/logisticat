@@ -1387,6 +1387,15 @@ select:focus {
     max-height: 240px;
 }
 
+.forgot-password-box {
+    text-align: right;
+    margin-top: -8px;
+}
+
+.forgot-password-box .link-btn {
+    font-size: 13px;
+}
+
 @keyframes badgePulse {
     0% {
         transform: scale(1);
