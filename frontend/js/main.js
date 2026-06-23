@@ -1139,43 +1139,25 @@ function calcularDiasRestantes(fechaCaducidad) {
     return dias;
 }
 
-function obtenerEstado(diasRestantes) {
-    if (diasRestantes < 0) {
-        return {
-            texto: "Vencido",
-            clase: "expired"
-        };
+function obtenerEstado(fechaCaducidad) {
+    const estado = obtenerClaveEstado(fechaCaducidad);
+    if (estado === "vencido") {
+        return "Vencido";
     }
-
-    if (diasRestantes <= 2) {
-        return {
-            texto: "Por vencer",
-            clase: "expired"
-        };
+    if (estado === "por-caducar") {
+        return "Por caducar";
     }
-
-    if (diasRestantes >= 3 && diasRestantes <= 7) {
-        return {
-            texto: "Por caducar",
-            clase: "warning"
-        };
-    }
-
-    return {
-        texto: "Activo",
-        clase: "active"
-    };
+    return "Activo";
 }
 
-function obtenerClaveEstado(diasRestantes) {
-    if (diasRestantes < 0) {
+function obtenerClaveEstado(fechaCaducidad) {
+    const dias = calcularDiasRestantes(fechaCaducidad);
+    if (dias < 0) {
         return "vencido";
     }
-
-    if (diasRestantes <= 7) {
+    if (dias <= 7) {
         return "por-caducar";
     }
-
     return "activo";
 }
 
@@ -1206,8 +1188,7 @@ function renderizarInventario() {
     const filtroEstado = statusFilter.value;
 
     const productosFiltrados = productos.filter((producto) => {
-        const diasRestantes = calcularDiasRestantes(producto.fechaCaducidad);
-        const claveEstado = obtenerClaveEstado(diasRestantes);
+        const claveEstado = obtenerClaveEstado(producto.fechaCaducidad);
 
         const coincideBusqueda = producto.nombre
             .toLowerCase()
@@ -1232,7 +1213,8 @@ function renderizarInventario() {
 
     productosFiltrados.forEach((producto) => {
         const diasRestantes = calcularDiasRestantes(producto.fechaCaducidad);
-        const estado = obtenerEstado(diasRestantes);
+        const claveEstado = obtenerClaveEstado(producto.fechaCaducidad);
+        const estadoTexto = obtenerEstado(producto.fechaCaducidad);
 
         const row = document.createElement("tr");
 
@@ -1243,8 +1225,8 @@ function renderizarInventario() {
             <td>${formatearFecha(producto.fechaCaducidad)}</td>
             <td>${diasRestantes}</td>
             <td>
-                <span class="status ${estado.clase}">
-                    ${estado.texto}
+                <span class="status ${claveEstado}">
+                    ${estadoTexto}
                 </span>
             </td>
             <td>
