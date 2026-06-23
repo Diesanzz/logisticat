@@ -1299,7 +1299,7 @@ async function obtenerResumenDesdeAPI() {
             return;
         }
 
-        const resumen = datos.resumen;
+        const resumen = datos;
         const productosActivos = resumen.totalProductos - resumen.productosPorCaducar - resumen.productosVencidos;
 
         totalProductos.textContent = resumen.totalProductos;
