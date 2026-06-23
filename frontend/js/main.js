@@ -1311,8 +1311,11 @@ async function obtenerResumenDesdeAPI() {
         productosVencidosReporte.textContent = resumen.productosVencidos;
         porcentajeMermaReporte.textContent = `${resumen.porcentajeMerma}%`;
 
-        barraMerma.style.width = `${resumen.porcentajeMerma}%`;
-        barraMermaTexto.textContent = `${resumen.porcentajeMerma}%`;
+        const porcentajeMerma = Number(resumen.porcentajeMerma) || 0;
+        const porcentajeBarra = Math.min(porcentajeMerma, 100);
+
+        barraMerma.style.width = `${porcentajeBarra}%`;
+        barraMermaTexto.textContent = `${porcentajeMerma}%`;
     } catch (error) {
         console.error("Error al obtener resumen:", error);
         mostrarToast("No se pudo conectar con la API de reportes.", "error");
