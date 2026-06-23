@@ -20,6 +20,7 @@ const userNameDisplay = document.getElementById("userNameDisplay");
 const userRoleDisplay = document.getElementById("userRoleDisplay");
 const userMenuToggle = document.getElementById("userMenuToggle");
 const userDropdown = document.getElementById("userDropdown");
+const openForgotPasswordBtn = document.getElementById("openForgotPasswordBtn");
 
 const productModal = document.getElementById("productModal");
 const openModalBtn = document.getElementById("openModalBtn");
@@ -62,6 +63,11 @@ const registerPassword = document.getElementById("registerPassword");
 const registerRol = document.getElementById("registerRol");
 const menuItems = document.querySelectorAll(".menu-item[data-page]");
 const pageSections = document.querySelectorAll(".page-section");
+const forgotPasswordModal = document.getElementById("forgotPasswordModal");
+const closeForgotPasswordModalBtn = document.getElementById("closeForgotPasswordModalBtn");
+const cancelForgotPasswordBtn = document.getElementById("cancelForgotPasswordBtn");
+const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+const forgotCorreo = document.getElementById("forgotCorreo");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -72,7 +78,14 @@ const productosPorCaducarReporte = document.getElementById("productosPorCaducarR
 const productosVencidosReporte = document.getElementById("productosVencidosReporte");
 const porcentajeMermaReporte = document.getElementById("porcentajeMermaReporte");
 const barraMerma = document.getElementById("barraMerma");
-const barraMermaTexto = document.getElementById("barraMermaTexto")
+const barraMermaTexto = document.getElementById("barraMermaTexto");
+const resetPasswordModal = document.getElementById("resetPasswordModal");
+const closeResetPasswordModalBtn = document.getElementById("closeResetPasswordModalBtn");
+const cancelResetPasswordBtn = document.getElementById("cancelResetPasswordBtn");
+const resetPasswordForm = document.getElementById("resetPasswordForm");
+const resetToken = document.getElementById("resetToken");
+const resetPassword = document.getElementById("resetPassword");
+const resetPasswordConfirm = document.getElementById("resetPasswordConfirm");
 
 const API_URL = "http://localhost:3000/api/productos";
 const REPORTES_URL = "http://localhost:3000/api/reportes/resumen";
@@ -321,6 +334,56 @@ menuItems.forEach((item) => {
 
         window.location.hash = page;
     });
+});
+
+openForgotPasswordBtn.addEventListener("click", () => {
+    forgotPasswordForm.reset();
+
+    if (loginCorreo.value.trim()) {
+        forgotCorreo.value = loginCorreo.value.trim();
+    }
+
+    forgotPasswordModal.classList.add("show");
+});
+
+closeForgotPasswordModalBtn.addEventListener("click", () => {
+    forgotPasswordModal.classList.remove("show");
+});
+
+cancelForgotPasswordBtn.addEventListener("click", () => {
+    forgotPasswordForm.reset();
+    forgotPasswordModal.classList.remove("show");
+});
+
+forgotPasswordModal.addEventListener("click", (event) => {
+    if (event.target === forgotPasswordModal) {
+        forgotPasswordModal.classList.remove("show");
+    }
+});
+
+forgotPasswordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await solicitarRecuperacionPassword();
+});
+
+closeResetPasswordModalBtn.addEventListener("click", () => {
+    resetPasswordModal.classList.remove("show");
+});
+
+cancelResetPasswordBtn.addEventListener("click", () => {
+    resetPasswordForm.reset();
+    resetPasswordModal.classList.remove("show");
+});
+
+resetPasswordModal.addEventListener("click", (event) => {
+    if (event.target === resetPasswordModal) {
+        resetPasswordModal.classList.remove("show");
+    }
+});
+
+resetPasswordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await restablecerPasswordDesdeFrontend();
 });
 
 
@@ -705,6 +768,108 @@ async function iniciarSesion() {
         console.error("Error al iniciar sesión:", error);
         mostrarToast("No se pudo conectar con la API de autenticación.", "error");
     }
+}
+
+async function solicitarRecuperacionPassword() {
+    try {
+        const correo = forgotCorreo.value.trim();
+
+        if (!correo) {
+            mostrarToast("Ingresa tu correo.", "warning");
+            return;
+        }
+
+        const respuesta = await fetch(`${AUTH_URL}/forgot-password`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ correo })
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "No se pudo solicitar la recuperación.", "error");
+            return;
+        }
+
+        forgotPasswordForm.reset();
+        forgotPasswordModal.classList.remove("show");
+
+        resetPasswordForm.reset();
+        resetPasswordModal.classList.add("show");
+
+        mostrarToast("Token enviado o generado. Revisa tu correo o la consola del backend.", "success");
+
+    } catch (error) {
+        console.error("Error al solicitar recuperación:", error);
+        mostrarToast("No se pudo conectar con la API de recuperación.", "error");
+    }
+}
+
+async function restablecerPasswordDesdeFrontend() {
+    try {
+        const token = resetToken.value.trim();
+        const nuevaPassword = resetPassword.value;
+        const confirmacion = resetPasswordConfirm.value;
+
+        if (!token || !nuevaPassword || !confirmacion) {
+            mostrarToast("Completa todos los campos.", "warning");
+            return;
+        }
+
+        if (nuevaPassword.length < 6) {
+            mostrarToast("La contraseña debe tener al menos 6 caracteres.", "warning");
+            return;
+        }
+
+        if (nuevaPassword !== confirmacion) {
+            mostrarToast("Las contraseñas no coinciden.", "warning");
+            return;
+        }
+
+        const respuesta = await fetch(`${AUTH_URL}/reset-password`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token,
+                nuevaPassword
+            })
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarToast(datos.message || "No se pudo cambiar la contraseña.", "error");
+            return;
+        }
+
+        resetPasswordForm.reset();
+        resetPasswordModal.classList.remove("show");
+
+        loginPassword.value = "";
+        mostrarToast("Contraseña actualizada. Ahora inicia sesión.", "success");
+
+    } catch (error) {
+        console.error("Error al restablecer contraseña:", error);
+        mostrarToast("No se pudo conectar con la API de cambio de contraseña.", "error");
+    }
+}
+
+function revisarTokenEnURL() {
+    const parametros = new URLSearchParams(window.location.search);
+    const token = parametros.get("resetToken");
+
+    if (!token) {
+        return;
+    }
+
+    resetPasswordForm.reset();
+    resetToken.value = token;
+    resetPasswordModal.classList.add("show");
 }
 
 function aplicarPermisos(usuario) {
@@ -1340,3 +1505,4 @@ async function confirmarSalida() {
 }
 
 verificarSesionInicial();
+revisarTokenEnURL();
