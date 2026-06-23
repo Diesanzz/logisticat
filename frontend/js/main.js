@@ -60,6 +60,8 @@ const registerNombre = document.getElementById("registerNombre");
 const registerCorreo = document.getElementById("registerCorreo");
 const registerPassword = document.getElementById("registerPassword");
 const registerRol = document.getElementById("registerRol");
+const menuItems = document.querySelectorAll(".menu-item[data-page]");
+const pageSections = document.querySelectorAll(".page-section");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -85,6 +87,9 @@ let mermasRegistradas = 0;
 let productoEditandoId = null;
 let productoSalidaId = null;
 let movimientos = [];
+let inventoryStatusChart = null;
+let inventoryPieChart = null;
+let movementsChart = null;
 
 openModalBtn.addEventListener("click", () => {
     productoEditandoId = null;
@@ -307,6 +312,17 @@ registerForm.addEventListener("submit", async (event) => {
     await registrarUsuarioDesdeFrontend();
 });
 
+menuItems.forEach((item) => {
+    item.addEventListener("click", (event) => {
+        event.preventDefault();
+
+        const page = item.dataset.page;
+        mostrarPagina(page);
+
+        window.location.hash = page;
+    });
+});
+
 
 
 
@@ -401,6 +417,188 @@ async function obtenerConfiguracionDesdeAPI() {
         console.error("Error al obtener configuración:", error);
         mostrarToast("No se pudo conectar con la API de configuración.", "error");
     }
+}
+
+function renderizarGraficasReportes() {
+    if (typeof Chart === "undefined") {
+        console.warn("Chart.js no está cargado.");
+        return;
+    }
+
+    const activos = productos.filter((producto) => obtenerClaveEstado(producto.fechaCaducidad) === "activo").length;
+    const porCaducar = productos.filter((producto) => obtenerClaveEstado(producto.fechaCaducidad) === "por-caducar").length;
+    const vencidos = productos.filter((producto) => obtenerClaveEstado(producto.fechaCaducidad) === "vencido").length;
+
+    const entradas = movimientos.filter((movimiento) => movimiento.tipo === "entrada").length;
+    const salidas = movimientos.filter((movimiento) => movimiento.tipo === "salida").length;
+    const mermas = movimientos.filter((movimiento) => movimiento.tipo === "merma").length;
+
+    const inventoryStatusCanvas = document.getElementById("inventoryStatusChart");
+    const inventoryPieCanvas = document.getElementById("inventoryPieChart");
+    const movementsCanvas = document.getElementById("movementsChart");
+
+    if (!inventoryStatusCanvas || !inventoryPieCanvas || !movementsCanvas) {
+        return;
+    }
+
+    if (inventoryStatusChart) {
+        inventoryStatusChart.destroy();
+    }
+
+    if (inventoryPieChart) {
+        inventoryPieChart.destroy();
+    }
+
+    if (movementsChart) {
+        movementsChart.destroy();
+    }
+
+    inventoryStatusChart = new Chart(inventoryStatusCanvas, {
+        type: "bar",
+        data: {
+            labels: ["Activos", "Por caducar", "Vencidos"],
+            datasets: [
+                {
+                    label: "Productos",
+                    data: [activos, porCaducar, vencidos],
+                    backgroundColor: [
+                        "rgba(49, 139, 56, 0.65)",
+                        "rgba(245, 194, 107, 0.75)",
+                        "rgba(194, 58, 58, 0.65)"
+                    ],
+                    borderColor: [
+                        "rgba(49, 139, 56, 1)",
+                        "rgba(197, 139, 64, 1)",
+                        "rgba(194, 58, 58, 1)"
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 10
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    inventoryPieChart = new Chart(inventoryPieCanvas, {
+        type: "doughnut",
+        data: {
+            labels: ["Activos", "Por caducar", "Vencidos"],
+            datasets: [
+                {
+                    data: [activos, porCaducar, vencidos],
+                    backgroundColor: [
+                        "rgba(49, 139, 56, 0.70)",
+                        "rgba(245, 194, 107, 0.80)",
+                        "rgba(194, 58, 58, 0.70)"
+                    ],
+                    borderColor: "#ffffff",
+                    borderWidth: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "65%",
+            plugins: {
+                legend: {
+                    position: "bottom"
+                }
+            }
+        }
+    });
+
+    movementsChart = new Chart(movementsCanvas, {
+        type: "bar",
+        data: {
+            labels: ["Entradas", "Salidas", "Mermas"],
+            datasets: [
+                {
+                    label: "Movimientos registrados",
+                    data: [entradas, salidas, mermas],
+                    backgroundColor: [
+                        "rgba(49, 139, 56, 0.65)",
+                        "rgba(197, 139, 64, 0.70)",
+                        "rgba(194, 58, 58, 0.65)"
+                    ],
+                    borderColor: [
+                        "rgba(49, 139, 56, 1)",
+                        "rgba(197, 139, 64, 1)",
+                        "rgba(194, 58, 58, 1)"
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 10
+                }
+            ]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+}
+
+function mostrarPagina(page) {
+    pageSections.forEach((section) => {
+        section.classList.remove("active-page");
+    });
+
+    menuItems.forEach((item) => {
+        item.classList.remove("active");
+    });
+
+    const targetSection = document.getElementById(page);
+    const targetMenuItem = document.querySelector(`.menu-item[data-page="${page}"]`);
+
+    if (!targetSection || !targetMenuItem) {
+        document.getElementById("dashboard").classList.add("active-page");
+
+        const dashboardItem = document.querySelector('.menu-item[data-page="dashboard"]');
+        if (dashboardItem) {
+            dashboardItem.classList.add("active");
+        }
+
+        return;
+    }
+
+    targetSection.classList.add("active-page");
+    targetMenuItem.classList.add("active");
+
+    if (page === "reportes") {
+    setTimeout(() => {
+        renderizarGraficasReportes();
+    }, 100);
+}
 }
 
 async function guardarConfiguracionHistorial() {
@@ -501,6 +699,7 @@ async function iniciarSesion() {
         mostrarToast(`Bienvenido, ${datos.usuario.nombre}.`, "success");
 
         await cargarDatosIniciales();
+        mostrarPagina("dashboard");
 
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
@@ -622,6 +821,7 @@ function cerrarSesion() {
 async function cargarDatosIniciales() {
     await obtenerProductosDesdeAPI();
     await obtenerConfiguracionDesdeAPI();
+    renderizarGraficasReportes();
 }
 
 function verificarSesionInicial() {
@@ -634,6 +834,9 @@ function verificarSesionInicial() {
 
     mostrarApp(usuario);
     cargarDatosIniciales();
+
+    const pageFromHash = window.location.hash.replace("#", "") || "dashboard";
+    mostrarPagina(pageFromHash);
 }
 
 async function obtenerProductosDesdeAPI() {
@@ -651,6 +854,7 @@ async function obtenerProductosDesdeAPI() {
         await obtenerAlertasDesdeAPI();
         await obtenerMovimientosDesdeAPI();
         await obtenerRecomendacionesDesdeAPI();
+        renderizarGraficasReportes();
 
     } catch (error) {
         console.error("Error al obtener productos:", error);
