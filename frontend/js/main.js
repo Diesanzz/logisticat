@@ -68,6 +68,7 @@ const closeForgotPasswordModalBtn = document.getElementById("closeForgotPassword
 const cancelForgotPasswordBtn = document.getElementById("cancelForgotPasswordBtn");
 const forgotPasswordForm = document.getElementById("forgotPasswordForm");
 const forgotCorreo = document.getElementById("forgotCorreo");
+const dropdownPageLinks = document.querySelectorAll("[data-dropdown-page]");
 
 const totalProductos = document.getElementById("totalProductos");
 const porCaducar = document.getElementById("porCaducar");
@@ -135,6 +136,22 @@ movementSearchInput.addEventListener("input", () => {
 
 statusFilter.addEventListener("change", () => {
     renderizarInventario();
+});
+
+dropdownPageLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const page = link.dataset.dropdownPage;
+
+        userDropdown.classList.add("hidden");
+        userMenuToggle.classList.remove("open");
+
+        mostrarPagina(page);
+
+        window.location.hash = page;
+    });
 });
 
 movementTypeFilter.addEventListener("change", () => {
