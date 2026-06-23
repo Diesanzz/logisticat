@@ -464,6 +464,22 @@ tbody tr:hover {
     color: var(--red-text);
 }
 
+/* Compatibilidad con claves en español usadas en JS */
+.status.activo {
+    background-color: var(--green);
+    color: var(--green-text);
+}
+
+.status[class*="por-caducar"], .status.por-caducar {
+    background-color: var(--yellow);
+    color: var(--yellow-text);
+}
+
+.status.vencido {
+    background-color: var(--red);
+    color: var(--red-text);
+}
+
 .type-badge {
     min-width: 90px;
 }
